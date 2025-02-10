@@ -34,7 +34,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import ru.yandex.practicum.SearchStats;
-import ru.yandex.practicum.client.StatsClient;
 import ru.yandex.practicum.dto.CreateStatsDto;
 import ru.yandex.practicum.dto.StatCountHitsDto;
 
