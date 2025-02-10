@@ -1,0 +1,65 @@
+spring:
+  cloud:
+    gateway:
+      httpclient:
+        connect-timeout: 5000
+        response-timeout: 5s
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: main-service
+          uri: lb://MAIN-SERVICE
+          predicates:
+            - Path=/admin/**, /users/**, /events/**, /categories/**, /compilations/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: ewm-service
+                fallbackUri: forward:/fallback/ewm-service
+
+        - id: stats-service
+          uri: lb://STATS-SERVER
+          predicates:
+            - Path=/hit, /stats
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: stats-service
+                fallbackUri: forward:/fallback/stats-service
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 5
+        registerHealthIndicator: true
+    instances:
+      ewm-service:
+        baseConfig: default
+      stats-service:
+        baseConfig: default
+
+management:
+  endpoint:
+    gateway:
+      enabled: true
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: INFO
+    org.springframework.http.server.reactive: INFO
+    org.springframework.web: INFO
+    reactor.netty: INFO
+    io.github.resilience4j: INFO

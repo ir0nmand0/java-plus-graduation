@@ -1,0 +1,11 @@
+server:
+  port: 8761
+
+eureka:
+  instance:
+    hostname: discovery-server
+  client:
+    register-with-eureka: false  # Eureka Server не регистрируется сам в себе
+    fetch-registry: false        # Eureka Server не загружает реестр сервисов
+    service-url:
+      defaultZone: http://discovery-server:8761/eureka/  # URL для других сервисов
