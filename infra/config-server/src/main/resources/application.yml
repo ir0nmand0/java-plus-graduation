@@ -1,0 +1,37 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-server
+  profiles:
+    # Активируем профиль "native", чтобы брать конфигурации
+    # из локальных директорий (classpath, filesystem и т.д.)
+    active: native
+  cloud:
+    config:
+      server:
+        native:
+          # Список директорий, из которых читать конфиги
+          searchLocations:
+            - classpath:config/core/main-service
+            - classpath:config/stats/stats-server
+            - classpath:config/infra/gateway
+
+# Настройки Eureka, чтобы Config Server искал и регистрировался
+eureka:
+  client:
+    serviceUrl:
+      # Путь к Eureka Server
+      defaultZone: http://discovery-server:8761/eureka/
+    # Разрешаем регистрироваться (если хотим, чтобы Config Server отображался в Eureka)
+    register-with-eureka: true
+    # Разрешаем получать реестр других сервисов (если нужно)
+    fetch-registry: true
+  instance:
+    # При регистрации использовать IP-адрес контейнера
+    prefer-ip-address: true
+    # Интервал обновления аренды (по умолчанию 10 с)
+    lease-renewal-interval-in-seconds: 10
+    # Время до исключения из Eureka, если сервис не откликнулся (30 с)
+    lease-expiration-duration-in-seconds: 30
