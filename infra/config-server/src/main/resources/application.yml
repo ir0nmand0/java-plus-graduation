@@ -14,7 +14,12 @@ spring:
         native:
           # Список директорий, из которых читать конфиги
           searchLocations:
-            - classpath:config/core/main-service
+            - classpath:config/core/category-service
+            - classpath:config/core/compilation-service
+            - classpath:config/core/event-service
+            - classpath:config/core/location-service
+            - classpath:config/core/request-service
+            - classpath:config/core/user-service
             - classpath:config/stats/stats-server
             - classpath:config/infra/gateway
 
