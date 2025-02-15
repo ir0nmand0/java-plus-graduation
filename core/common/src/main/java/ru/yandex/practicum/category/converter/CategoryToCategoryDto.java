@@ -1,9 +1,9 @@
 package ru.yandex.practicum.category.converter;
 
-import ru.yandex.practicum.category.model.Category;
-import ru.yandex.practicum.category.model.dto.CategoryDto;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.category.model.Category;
+import ru.yandex.practicum.category.model.dto.CategoryDto;
 
 @Component
 public class CategoryToCategoryDto implements Converter<Category, CategoryDto> {

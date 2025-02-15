@@ -1,9 +1,5 @@
 package ru.yandex.practicum.exception;
 
-import ru.yandex.practicum.exception.model.ErrorResponse;
-import ru.yandex.practicum.exception.type.ConflictDateException;
-import ru.yandex.practicum.exception.type.ConflictException;
-import ru.yandex.practicum.exception.type.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -13,6 +9,10 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.yandex.practicum.exception.model.ErrorResponse;
+import ru.yandex.practicum.exception.type.ConflictDateException;
+import ru.yandex.practicum.exception.type.ConflictException;
+import ru.yandex.practicum.exception.type.NotFoundException;
 
 import java.time.LocalDateTime;
 

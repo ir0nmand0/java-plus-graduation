@@ -1,6 +1,5 @@
 package ru.yandex.practicum.compilation.model;
 
-import ru.yandex.practicum.event.model.Event;
 import jakarta.persistence.*;
 import lombok.*;
 

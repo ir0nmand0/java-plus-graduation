@@ -1,8 +1,5 @@
 package ru.yandex.practicum.controller;
 
-import ru.yandex.practicum.location.api.PublicLocationApi;
-import ru.yandex.practicum.location.model.dto.LocationDto;
-import ru.yandex.practicum.service.LocationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -10,6 +7,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.yandex.practicum.location.api.PublicLocationApi;
+import ru.yandex.practicum.location.model.dto.LocationDto;
+import ru.yandex.practicum.service.LocationService;
 
 import javax.xml.stream.Location;
 import java.util.List;

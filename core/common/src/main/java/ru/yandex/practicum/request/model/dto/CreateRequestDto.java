@@ -1,9 +1,9 @@
 package ru.yandex.practicum.request.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import ru.yandex.practicum.state.State;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Builder;
+import ru.yandex.practicum.state.State;
 
 import java.time.LocalDateTime;
 

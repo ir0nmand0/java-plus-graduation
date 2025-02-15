@@ -1,9 +1,9 @@
 package ru.yandex.practicum.user.converter;
 
-import ru.yandex.practicum.user.model.User;
-import ru.yandex.practicum.user.model.dto.UserDto;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.user.model.User;
+import ru.yandex.practicum.user.model.dto.UserDto;
 
 @Component
 public class UserToUserDtoConverter implements Converter<User, UserDto> {

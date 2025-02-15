@@ -1,9 +1,9 @@
 package ru.yandex.practicum.event.validation;
 
-import ru.yandex.practicum.event.model.PublicParameter;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.util.ObjectUtils;
+import ru.yandex.practicum.event.model.PublicParameter;
 
 public class CheckStartAndEndDateValidator implements ConstraintValidator<EventStartDateBeforeEndDate, PublicParameter> {
     @Override

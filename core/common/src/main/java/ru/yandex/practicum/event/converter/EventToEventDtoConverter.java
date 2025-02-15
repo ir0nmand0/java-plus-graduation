@@ -1,13 +1,9 @@
 package ru.yandex.practicum.event.converter;
 
-import ru.yandex.practicum.category.converter.CategoryToCategoryDto;
-import ru.yandex.practicum.event.model.Event;
-import ru.yandex.practicum.event.model.dto.EventDto;
-import ru.yandex.practicum.location.converter.LocationToLocationDtoConverter;
-import ru.yandex.practicum.user.converter.UserToUserWithoutEmailDtoConverter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.event.model.Event;
+import ru.yandex.practicum.event.model.dto.EventDto;
 
 @Component
 public class EventToEventDtoConverter implements Converter<Event, EventDto> {

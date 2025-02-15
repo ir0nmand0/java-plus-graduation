@@ -1,12 +1,5 @@
 package ru.yandex.practicum.controller;
 
-import jakarta.validation.constraints.NotNull;
-import ru.yandex.practicum.location.api.AdminLocationApi;
-import ru.yandex.practicum.location.model.dto.CreateLocationDto;
-import ru.yandex.practicum.location.model.dto.LocationDto;
-import ru.yandex.practicum.location.model.dto.LocationLatAndLonDto;
-import ru.yandex.practicum.location.model.dto.UpdateLocationDto;
-import ru.yandex.practicum.service.LocationService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.location.api.AdminLocationApi;
+import ru.yandex.practicum.location.model.dto.CreateLocationDto;
+import ru.yandex.practicum.location.model.dto.LocationDto;
+import ru.yandex.practicum.location.model.dto.LocationLatAndLonDto;
+import ru.yandex.practicum.location.model.dto.UpdateLocationDto;
+import ru.yandex.practicum.service.LocationService;
 
 import javax.xml.stream.Location;
 import java.util.List;

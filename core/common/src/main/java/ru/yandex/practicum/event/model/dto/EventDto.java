@@ -17,29 +17,29 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventDto {
-        private long id;
-        private String annotation;
-        private CategoryDto category;
-        private int confirmedRequests;
+    private long id;
+    private String annotation;
+    private CategoryDto category;
+    private int confirmedRequests;
 
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-        private LocalDateTime createdOn;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdOn;
 
-        private String description;
+    private String description;
 
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-        private LocalDateTime eventDate;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime eventDate;
 
-        private UserWithoutEmailDto initiator;
-        private LocationDto location;
-        private boolean paid;
-        private int participantLimit;
+    private UserWithoutEmailDto initiator;
+    private LocationDto location;
+    private boolean paid;
+    private int participantLimit;
 
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-        private LocalDateTime publishedOn;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime publishedOn;
 
-        private boolean requestModeration;
-        private State state;
-        private String title;
-        private long views;
+    private boolean requestModeration;
+    private State state;
+    private String title;
+    private long views;
 }

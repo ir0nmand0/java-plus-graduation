@@ -1,10 +1,10 @@
 package ru.yandex.practicum.location.model.dto;
 
-import ru.yandex.practicum.location.validation.ConstraintNotZero;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
+import ru.yandex.practicum.location.validation.ConstraintNotZero;
 
 @Builder
 public record CreateLocationDto(

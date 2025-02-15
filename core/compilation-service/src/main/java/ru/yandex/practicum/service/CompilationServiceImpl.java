@@ -1,15 +1,6 @@
 package ru.yandex.practicum.service;
 
 
-import ru.yandex.practicum.event.client.AdminEventClient;
-import ru.yandex.practicum.compilation.model.Compilation;
-import ru.yandex.practicum.compilation.model.dto.CompilationDto;
-import ru.yandex.practicum.compilation.model.dto.CreateCompilationDto;
-import ru.yandex.practicum.compilation.model.dto.UpdateCompilationDto;
-import ru.yandex.practicum.event.model.dto.EventDto;
-import ru.yandex.practicum.storage.CompilationStorage;
-import ru.yandex.practicum.event.model.Event;
-import ru.yandex.practicum.exception.type.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,6 +8,15 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import ru.yandex.practicum.compilation.model.Compilation;
+import ru.yandex.practicum.compilation.model.dto.CompilationDto;
+import ru.yandex.practicum.compilation.model.dto.CreateCompilationDto;
+import ru.yandex.practicum.compilation.model.dto.UpdateCompilationDto;
+import ru.yandex.practicum.event.client.AdminEventClient;
+import ru.yandex.practicum.event.model.Event;
+import ru.yandex.practicum.event.model.dto.EventDto;
+import ru.yandex.practicum.exception.type.NotFoundException;
+import ru.yandex.practicum.storage.CompilationStorage;
 
 import java.util.*;
 import java.util.stream.Collectors;

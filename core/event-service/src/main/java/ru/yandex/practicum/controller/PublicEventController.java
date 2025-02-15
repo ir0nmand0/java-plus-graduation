@@ -1,11 +1,5 @@
 package ru.yandex.practicum.controller;
 
-import ru.yandex.practicum.event.api.PublicEventApi;
-import ru.yandex.practicum.event.model.Event;
-import ru.yandex.practicum.event.model.PublicParameter;
-import ru.yandex.practicum.event.model.dto.EventDto;
-import ru.yandex.practicum.service.EventService;
-import ru.yandex.practicum.location.validation.ConstraintNotZero;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -14,6 +8,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.event.api.PublicEventApi;
+import ru.yandex.practicum.event.model.Event;
+import ru.yandex.practicum.event.model.PublicParameter;
+import ru.yandex.practicum.event.model.dto.EventDto;
+import ru.yandex.practicum.location.validation.ConstraintNotZero;
+import ru.yandex.practicum.service.EventService;
 
 import java.util.List;
 

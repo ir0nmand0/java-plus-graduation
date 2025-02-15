@@ -14,7 +14,7 @@ import ru.yandex.practicum.SearchStats;
 import ru.yandex.practicum.category.client.PublicCategoryClient;
 import ru.yandex.practicum.category.model.Category;
 import ru.yandex.practicum.category.model.dto.CategoryDto;
-import ru.yandex.practicum.client.*;
+import ru.yandex.practicum.client.StatsClient;
 import ru.yandex.practicum.dto.CreateStatsDto;
 import ru.yandex.practicum.dto.StatCountHitsDto;
 import ru.yandex.practicum.event.model.AdminParameter;
@@ -41,7 +41,10 @@ import ru.yandex.practicum.user.model.dto.UserDto;
 import ru.yandex.practicum.user.model.dto.UserWithoutEmailDto;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 

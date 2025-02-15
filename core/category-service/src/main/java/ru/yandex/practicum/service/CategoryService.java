@@ -1,6 +1,5 @@
 package ru.yandex.practicum.service;
 
-import jakarta.validation.constraints.Positive;
 import ru.yandex.practicum.category.model.dto.CategoryDto;
 import ru.yandex.practicum.category.model.dto.CreateCategoryDto;
 

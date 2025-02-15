@@ -17,15 +17,15 @@ import java.util.List;
 @RequestMapping("/events")
 public interface PublicEventApi {
     @GetMapping("/{id}")
-     EventDto getById(@PathVariable @Positive final long id, final HttpServletRequest request);
+    EventDto getById(@PathVariable @Positive final long id, final HttpServletRequest request);
 
     @GetMapping
-     List<EventDto> getAll(@Valid final PublicParameter parameter,
-                                 final HttpServletRequest request);
+    List<EventDto> getAll(@Valid final PublicParameter parameter,
+                          final HttpServletRequest request);
 
     @GetMapping("/locations")
-     List<EventDto> getEventsByLatAndLon(@RequestParam @ConstraintNotZero final Double lat,
-                                               @RequestParam @ConstraintNotZero final Double lon,
-                                               @RequestParam(required = false, defaultValue = "0")
-                                               @PositiveOrZero final double radius);
+    List<EventDto> getEventsByLatAndLon(@RequestParam @ConstraintNotZero final Double lat,
+                                        @RequestParam @ConstraintNotZero final Double lon,
+                                        @RequestParam(required = false, defaultValue = "0")
+                                        @PositiveOrZero final double radius);
 }

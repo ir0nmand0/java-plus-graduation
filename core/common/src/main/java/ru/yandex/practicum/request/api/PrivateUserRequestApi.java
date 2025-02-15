@@ -15,14 +15,14 @@ public interface PrivateUserRequestApi {
     @PostMapping("/{userId}/requests")
     @ResponseStatus(HttpStatus.CREATED)
     RequestDto create(@PathVariable @Positive final long userId,
-                             @RequestParam @Positive final long eventId);
+                      @RequestParam @Positive final long eventId);
 
     @GetMapping("/{userId}/requests")
     List<RequestDto> getAll(@PathVariable @Positive final long userId);
 
     @PatchMapping("/{userId}/requests/{requestId}/cancel")
     RequestDto cancel(@PathVariable @Positive final long userId,
-                             @PathVariable @Positive final long requestId);
+                      @PathVariable @Positive final long requestId);
 
     @GetMapping("/{userId}/requests/events/{eventId}")
     List<RequestDto> findAllByEventId(@PathVariable(required = false) @Positive final long userId,

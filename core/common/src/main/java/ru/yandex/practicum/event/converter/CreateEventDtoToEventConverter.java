@@ -1,10 +1,10 @@
 package ru.yandex.practicum.event.converter;
 
-import ru.yandex.practicum.event.model.Event;
-import ru.yandex.practicum.event.model.dto.CreateEventDto;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
+import ru.yandex.practicum.event.model.Event;
+import ru.yandex.practicum.event.model.dto.CreateEventDto;
 
 @Component
 public class CreateEventDtoToEventConverter implements Converter<CreateEventDto, Event> {

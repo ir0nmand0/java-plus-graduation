@@ -14,8 +14,8 @@ import java.util.List;
 public interface PublicCompilationApi {
     @GetMapping
     List<CompilationDto> getCompilations(@RequestParam(required = false) final Boolean pinned,
-                                                @RequestParam(defaultValue = "0") @PositiveOrZero final int from,
-                                                @RequestParam(defaultValue = "10") @Positive final int size);
+                                         @RequestParam(defaultValue = "0") @PositiveOrZero final int from,
+                                         @RequestParam(defaultValue = "10") @Positive final int size);
 
     @GetMapping("/{compId}")
     CompilationDto getCompilation(@PathVariable @Positive final long compId);

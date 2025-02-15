@@ -1,10 +1,11 @@
 package ru.yandex.practicum.request.model;
 
-import ru.yandex.practicum.event.model.Event;
-import ru.yandex.practicum.state.State;
-import ru.yandex.practicum.user.model.User;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.yandex.practicum.state.State;
 
 import java.time.LocalDateTime;
 

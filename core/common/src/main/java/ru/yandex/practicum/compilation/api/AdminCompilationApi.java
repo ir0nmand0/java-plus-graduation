@@ -16,7 +16,7 @@ public interface AdminCompilationApi {
 
     @PatchMapping("/{compId}")
     CompilationDto update(@RequestBody @Valid final UpdateCompilationDto updateCompilationDto,
-                                 @PathVariable @Positive final long compId);
+                          @PathVariable @Positive final long compId);
 
     @DeleteMapping("/{compId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

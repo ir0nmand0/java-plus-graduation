@@ -1,17 +1,17 @@
 package ru.yandex.practicum.service;
 
-import ru.yandex.practicum.location.model.Location;
-import ru.yandex.practicum.location.model.dto.CreateLocationDto;
-import ru.yandex.practicum.location.model.dto.LocationDto;
-import ru.yandex.practicum.location.model.dto.LocationLatAndLonDto;
-import ru.yandex.practicum.location.model.dto.UpdateLocationDto;
-import ru.yandex.practicum.storage.LocationStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import ru.yandex.practicum.location.model.Location;
+import ru.yandex.practicum.location.model.dto.CreateLocationDto;
+import ru.yandex.practicum.location.model.dto.LocationDto;
+import ru.yandex.practicum.location.model.dto.LocationLatAndLonDto;
+import ru.yandex.practicum.location.model.dto.UpdateLocationDto;
+import ru.yandex.practicum.storage.LocationStorage;
 
 import java.util.List;
 import java.util.Set;

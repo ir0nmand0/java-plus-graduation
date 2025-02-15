@@ -1,9 +1,9 @@
 package ru.yandex.practicum.location.converter;
 
-import ru.yandex.practicum.location.model.Location;
-import ru.yandex.practicum.location.model.dto.LocationDto;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.location.model.Location;
+import ru.yandex.practicum.location.model.dto.LocationDto;
 
 @Component
 public class LocationDtoToLocationConverter implements Converter<LocationDto, Location> {

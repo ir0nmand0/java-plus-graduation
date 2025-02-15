@@ -1,14 +1,14 @@
 package ru.yandex.practicum.storage.database;
 
-import ru.yandex.practicum.exception.type.NotFoundException;
-import ru.yandex.practicum.user.model.User;
-import ru.yandex.practicum.storage.UserStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import ru.yandex.practicum.exception.type.NotFoundException;
+import ru.yandex.practicum.storage.UserStorage;
+import ru.yandex.practicum.user.model.User;
 
 import java.util.List;
 import java.util.Optional;

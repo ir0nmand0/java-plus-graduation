@@ -5,7 +5,6 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.event.model.Event;
 import ru.yandex.practicum.user.model.dto.CreateUserDto;
 import ru.yandex.practicum.user.model.dto.UserDto;
 
@@ -19,8 +18,8 @@ public interface AdminUserApi {
 
     @GetMapping
     List<UserDto> getAll(@RequestParam(required = false) final List<Long> ids,
-                                @RequestParam(defaultValue = "0") @PositiveOrZero final int from,
-                                @RequestParam(defaultValue = "10") @Positive final int size);
+                         @RequestParam(defaultValue = "0") @PositiveOrZero final int from,
+                         @RequestParam(defaultValue = "10") @Positive final int size);
 
     @DeleteMapping("/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

@@ -1,11 +1,11 @@
 package ru.yandex.practicum.event.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.hibernate.validator.constraints.Length;
 import ru.yandex.practicum.event.validation.ConstraintFutureInTwoHours;
 import ru.yandex.practicum.event.validation.ConstraintPositiveOrZero;
 import ru.yandex.practicum.location.model.dto.LocationLatAndLonDto;
 import ru.yandex.practicum.state.StateAction;
-import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
 

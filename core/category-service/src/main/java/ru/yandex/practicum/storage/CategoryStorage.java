@@ -1,7 +1,6 @@
 package ru.yandex.practicum.storage;
 
 import ru.yandex.practicum.category.model.Category;
-import ru.yandex.practicum.category.model.dto.CategoryDto;
 
 import java.util.List;
 import java.util.Optional;

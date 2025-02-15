@@ -1,7 +1,6 @@
 package ru.yandex.practicum.location.api;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +22,7 @@ public interface AdminLocationApi {
 
     @PatchMapping("/{locId}")
     LocationDto update(@RequestBody final UpdateLocationDto updateLocationDto,
-                              @PathVariable @Positive final long locId);
+                       @PathVariable @Positive final long locId);
 
     @DeleteMapping("/{locId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

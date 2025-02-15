@@ -1,13 +1,13 @@
 package ru.yandex.practicum.service;
 
-import ru.yandex.practicum.user.model.User;
-import ru.yandex.practicum.user.model.dto.CreateUserDto;
-import ru.yandex.practicum.user.model.dto.UserDto;
-import ru.yandex.practicum.storage.UserStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.storage.UserStorage;
+import ru.yandex.practicum.user.model.User;
+import ru.yandex.practicum.user.model.dto.CreateUserDto;
+import ru.yandex.practicum.user.model.dto.UserDto;
 
 import java.util.List;
 import java.util.Set;

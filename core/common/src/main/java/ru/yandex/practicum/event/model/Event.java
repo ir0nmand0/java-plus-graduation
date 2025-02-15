@@ -1,11 +1,8 @@
 package ru.yandex.practicum.event.model;
 
-import ru.yandex.practicum.category.model.Category;
-import ru.yandex.practicum.location.model.Location;
-import ru.yandex.practicum.state.State;
-import ru.yandex.practicum.user.model.User;
 import jakarta.persistence.*;
 import lombok.*;
+import ru.yandex.practicum.state.State;
 
 import java.time.LocalDateTime;
 

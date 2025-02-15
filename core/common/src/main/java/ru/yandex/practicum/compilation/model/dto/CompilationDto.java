@@ -1,10 +1,10 @@
 package ru.yandex.practicum.compilation.model.dto;
 
-import ru.yandex.practicum.event.model.dto.EventDto;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import ru.yandex.practicum.event.model.dto.EventDto;
 
 import java.util.List;
 

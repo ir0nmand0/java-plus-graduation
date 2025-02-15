@@ -1,9 +1,9 @@
 package ru.yandex.practicum.request.model.dto;
 
-import ru.yandex.practicum.state.State;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
+import ru.yandex.practicum.state.State;
 
 import java.util.Set;
 

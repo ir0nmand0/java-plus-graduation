@@ -11,6 +11,6 @@ import java.util.List;
 public interface PublicLocationApi {
     @GetMapping
     List<LocationDto> getAll(@RequestParam(required = false, defaultValue = "") final String text,
-                                    @RequestParam(defaultValue = "0") final int from,
-                                    @RequestParam(defaultValue = "10") final int size);
+                             @RequestParam(defaultValue = "0") final int from,
+                             @RequestParam(defaultValue = "10") final int size);
 }

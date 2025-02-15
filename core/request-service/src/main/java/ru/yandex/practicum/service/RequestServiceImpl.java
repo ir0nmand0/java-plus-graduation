@@ -1,24 +1,24 @@
 package ru.yandex.practicum.service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import ru.yandex.practicum.category.client.PublicCategoryClient;
 import ru.yandex.practicum.category.model.dto.CategoryDto;
 import ru.yandex.practicum.event.client.AdminEventClient;
-import ru.yandex.practicum.user.client.AdminUserClient;
-import ru.yandex.practicum.category.client.PublicCategoryClient;
 import ru.yandex.practicum.event.model.Event;
 import ru.yandex.practicum.event.model.dto.EventDto;
 import ru.yandex.practicum.exception.type.ConflictException;
 import ru.yandex.practicum.exception.type.NotFoundException;
 import ru.yandex.practicum.request.model.Request;
 import ru.yandex.practicum.request.model.dto.RequestDto;
-import ru.yandex.practicum.storage.RequestStorage;
 import ru.yandex.practicum.state.State;
+import ru.yandex.practicum.storage.RequestStorage;
+import ru.yandex.practicum.user.client.AdminUserClient;
 import ru.yandex.practicum.user.model.User;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.stereotype.Service;
 import ru.yandex.practicum.user.model.dto.UserDto;
 import ru.yandex.practicum.user.model.dto.UserWithoutEmailDto;
 

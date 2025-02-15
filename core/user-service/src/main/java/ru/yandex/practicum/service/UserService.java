@@ -1,7 +1,5 @@
 package ru.yandex.practicum.service;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import ru.yandex.practicum.user.model.dto.CreateUserDto;
 import ru.yandex.practicum.user.model.dto.UserDto;
 

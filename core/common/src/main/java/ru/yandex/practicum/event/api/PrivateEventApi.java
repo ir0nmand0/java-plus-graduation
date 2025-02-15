@@ -18,30 +18,30 @@ import java.util.List;
 public interface PrivateEventApi {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-     EventDto create(@RequestBody @Valid final CreateEventDto createEventDto,
-                           @PathVariable @Positive final long userId);
+    EventDto create(@RequestBody @Valid final CreateEventDto createEventDto,
+                    @PathVariable @Positive final long userId);
 
     @GetMapping
-     List<EventDto> getAllByUserId(@PathVariable @Positive final long userId,
-                                         @RequestParam(defaultValue = "0") @PositiveOrZero final int from,
-                                         @RequestParam(defaultValue = "10") @Positive final int size);
+    List<EventDto> getAllByUserId(@PathVariable @Positive final long userId,
+                                  @RequestParam(defaultValue = "0") @PositiveOrZero final int from,
+                                  @RequestParam(defaultValue = "10") @Positive final int size);
 
     @GetMapping("/{eventId}")
-     EventDto getByIdAndUserId(@PathVariable @Positive final long userId,
-                                     @PathVariable @Positive final long eventId);
+    EventDto getByIdAndUserId(@PathVariable @Positive final long userId,
+                              @PathVariable @Positive final long eventId);
 
     @GetMapping("/{eventId}/requests")
-     List<RequestDto> getRequestsByUserIdAndEventId(@PathVariable @Positive final long userId,
-                                                          @PathVariable @Positive final long eventId);
+    List<RequestDto> getRequestsByUserIdAndEventId(@PathVariable @Positive final long userId,
+                                                   @PathVariable @Positive final long eventId);
 
     @PatchMapping("/{eventId}/requests")
-     RequestStatusUpdateResultDto updateRequestsByUserAndEvent(
+    RequestStatusUpdateResultDto updateRequestsByUserAndEvent(
             @RequestBody final UpdateRequestByIdsDto updateEventStatusByRequestIds,
             @PathVariable @Positive final long userId,
             @PathVariable @Positive final long eventId);
 
     @PatchMapping("/{eventId}")
-     EventDto update(@PathVariable @Positive final long userId,
-                           @PathVariable @Positive final long eventId,
-                           @RequestBody @Valid UpdateEventDto updateEventDto);
+    EventDto update(@PathVariable @Positive final long userId,
+                    @PathVariable @Positive final long eventId,
+                    @RequestBody @Valid UpdateEventDto updateEventDto);
 }
