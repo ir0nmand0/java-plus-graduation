@@ -56,7 +56,7 @@ public class PrivateUserRequestController implements PrivateUserRequestApi {
 
     @Override
     @GetMapping("/{userId}/requests/events/{eventId}/ids")
-    public List<Request> findAllByIdInAndEventId(@PathVariable(required = false) @Positive long userId,
+    public List<RequestDto> findAllByIdInAndEventId(@PathVariable(required = false) @Positive long userId,
                                                  @RequestParam @NotEmpty final Set<Long> ids,
                                                  @PathVariable @Positive final long eventId) {
         log.info("Getting all {} by ids - {} and event id - {}", SIMPLE_NAME, ids, eventId);
@@ -76,7 +76,7 @@ public class PrivateUserRequestController implements PrivateUserRequestApi {
     @PostMapping("/{userId}/requests/events/save")
     @ResponseStatus(HttpStatus.CREATED)
     public void saveAll(@PathVariable(required = false) @Positive long userId,
-                        @RequestBody @NotEmpty List<Request> requests) {
+                        @RequestBody @NotEmpty List<RequestDto> requests) {
         log.info("Saving batch of {} - size: {}", SIMPLE_NAME, requests.size());
         requestService.saveAll(requests);
     }

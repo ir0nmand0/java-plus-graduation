@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.event.api.AdminEventApi;
-import ru.yandex.practicum.event.model.AdminParameter;
+import ru.yandex.practicum.event.model.dto.AdminParameterDto;
 import ru.yandex.practicum.event.model.Event;
 import ru.yandex.practicum.event.model.dto.EventDto;
 import ru.yandex.practicum.event.model.dto.UpdateEventDto;
@@ -27,9 +27,9 @@ public class AdminEventController implements AdminEventApi {
     private final EventService eventService;
 
     @GetMapping
-    public List<EventDto> getAll(@Valid final AdminParameter adminParameter) {
-        log.info("Administrator's request to provide {} by parameters - {}", SIMPLE_NAME, adminParameter);
-        return eventService.getAllByAdmin(adminParameter);
+    public List<EventDto> getAll(@Valid final AdminParameterDto adminParameterDto) {
+        log.info("Administrator's request to provide {} by parameters - {}", SIMPLE_NAME, adminParameterDto);
+        return eventService.getAllByAdmin(adminParameterDto);
     }
 
     @PatchMapping("/{eventId}")

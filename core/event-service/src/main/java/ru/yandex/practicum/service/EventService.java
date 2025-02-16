@@ -1,8 +1,8 @@
 package ru.yandex.practicum.service;
 
 import jakarta.servlet.http.HttpServletRequest;
-import ru.yandex.practicum.event.model.AdminParameter;
-import ru.yandex.practicum.event.model.PublicParameter;
+import ru.yandex.practicum.event.model.dto.AdminParameterDto;
+import ru.yandex.practicum.event.model.dto.PublicParameterDto;
 import ru.yandex.practicum.event.model.dto.CreateEventDto;
 import ru.yandex.practicum.event.model.dto.EventDto;
 import ru.yandex.practicum.event.model.dto.UpdateEventDto;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface EventService {
-    List<EventDto> getAllByAdmin(final AdminParameter adminParameter);
+    List<EventDto> getAllByAdmin(final AdminParameterDto adminParameterDto);
 
     List<EventDto> getAllByIds(final Set<Long> ids);
 
@@ -34,7 +34,7 @@ public interface EventService {
 
     EventDto getById(final long eventId, final HttpServletRequest request);
 
-    List<EventDto> getAll(final PublicParameter publicParameter, final HttpServletRequest request);
+    List<EventDto> getAll(final PublicParameterDto publicParameterDto, final HttpServletRequest request);
 
     List<EventDto> getAllByLocation(final double lat, final double lon, final double radius);
 

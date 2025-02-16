@@ -17,9 +17,9 @@ import ru.yandex.practicum.category.model.dto.CategoryDto;
 import ru.yandex.practicum.client.StatsClient;
 import ru.yandex.practicum.dto.CreateStatsDto;
 import ru.yandex.practicum.dto.StatCountHitsDto;
-import ru.yandex.practicum.event.model.AdminParameter;
+import ru.yandex.practicum.event.model.dto.AdminParameterDto;
 import ru.yandex.practicum.event.model.Event;
-import ru.yandex.practicum.event.model.PublicParameter;
+import ru.yandex.practicum.event.model.dto.PublicParameterDto;
 import ru.yandex.practicum.event.model.dto.CreateEventDto;
 import ru.yandex.practicum.event.model.dto.EventDto;
 import ru.yandex.practicum.event.model.dto.UpdateEventDto;
@@ -66,12 +66,12 @@ public class EventServiceImpl implements EventService {
     private final StatsClient statsClient;
 
     @Override
-    public List<EventDto> getAllByAdmin(final AdminParameter adminParameter) {
-        final List<Event> lists = eventStorage.findAll(getSpecification(adminParameter),
-                PageRequest.of(adminParameter.getFrom() / adminParameter.getSize(),
-                        adminParameter.getSize()));
+    public List<EventDto> getAllByAdmin(final AdminParameterDto adminParameterDto) {
+        final List<Event> lists = eventStorage.findAll(getSpecification(adminParameterDto),
+                PageRequest.of(adminParameterDto.getFrom() / adminParameterDto.getSize(),
+                        adminParameterDto.getSize()));
 
-        lists.forEach(event -> updateStats(event, adminParameter.getRangeStart(), adminParameter.getRangeEnd(), true));
+        lists.forEach(event -> updateStats(event, adminParameterDto.getRangeStart(), adminParameterDto.getRangeEnd(), true));
 
         Set<Long> categoryIds = lists.stream()
                 .map(Event::getCategoryId)
@@ -388,7 +388,10 @@ public class EventServiceImpl implements EventService {
     public RequestStatusUpdateResultDto updateRequestsStatusByUserIdAndEventId(final long userId, final long eventId,
                                                                                UpdateRequestByIdsDto update) {
 
-        List<Request> requests = privateUserRequestClient.findAllByIdInAndEventId(userId, update.requestIds(), eventId);
+        List<Request> requests = privateUserRequestClient
+                .findAllByIdInAndEventId(userId, update.requestIds(), eventId).stream()
+                .map(requestDto -> cs.convert(requestDto, Request.class))
+                .toList();
 
         if (ObjectUtils.isEmpty(requests)) {
             throw new NotFoundException("No requests found for event id " + eventId);
@@ -437,7 +440,12 @@ public class EventServiceImpl implements EventService {
         }
 
         if (!requestsForSave.isEmpty()) {
-            privateUserRequestClient.saveAll(userId, requestsForSave);
+
+            List<RequestDto> requestDtos = requestsForSave.stream()
+                    .map(requestDto -> cs.convert(requestDto, RequestDto.class))
+                    .toList();
+
+            privateUserRequestClient.saveAll(userId, requestDtos);
         }
 
         return result;
@@ -473,30 +481,30 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventDto> getAll(final PublicParameter publicParameter, final HttpServletRequest request) {
+    public List<EventDto> getAll(final PublicParameterDto publicParameterDto, final HttpServletRequest request) {
         BooleanExpression predicate = event.isNotNull();
 
-        if (!ObjectUtils.isEmpty(publicParameter.getText())) {
-            predicate = predicate.and(event.annotation.likeIgnoreCase(publicParameter.getText()));
+        if (!ObjectUtils.isEmpty(publicParameterDto.getText())) {
+            predicate = predicate.and(event.annotation.likeIgnoreCase(publicParameterDto.getText()));
         }
 
-        if (!ObjectUtils.isEmpty(publicParameter.getCategories())) {
-            predicate = predicate.and(event.categoryId.in(publicParameter.getCategories()));
+        if (!ObjectUtils.isEmpty(publicParameterDto.getCategories())) {
+            predicate = predicate.and(event.categoryId.in(publicParameterDto.getCategories()));
         }
-        if (!ObjectUtils.isEmpty(publicParameter.getPaid())) {
-            predicate = predicate.and(event.paid.eq(publicParameter.getPaid()));
+        if (!ObjectUtils.isEmpty(publicParameterDto.getPaid())) {
+            predicate = predicate.and(event.paid.eq(publicParameterDto.getPaid()));
         }
 
-        predicate = predicate.and(event.createdOn.between(publicParameter.getRangeStart(), publicParameter.getRangeEnd()));
+        predicate = predicate.and(event.createdOn.between(publicParameterDto.getRangeStart(), publicParameterDto.getRangeEnd()));
 
         addStats(request);
 
         final List<Event> lists = eventStorage.findAll(
-                predicate, PageRequest.of(publicParameter.getFrom() / publicParameter.getSize(),
-                        publicParameter.getSize())
+                predicate, PageRequest.of(publicParameterDto.getFrom() / publicParameterDto.getSize(),
+                        publicParameterDto.getSize())
         );
 
-        lists.forEach(event -> updateStats(event, publicParameter.getRangeStart(), publicParameter.getRangeEnd(), false));
+        lists.forEach(event -> updateStats(event, publicParameterDto.getRangeStart(), publicParameterDto.getRangeEnd(), false));
 
         eventStorage.saveAll(lists);
 
@@ -714,30 +722,30 @@ public class EventServiceImpl implements EventService {
                 : ((root, query, criteriaBuilder) -> criteriaBuilder.lessThan(root.get("eventDate"), end));
     }
 
-    private Specification<Event> getSpecification(final AdminParameter adminParameter) {
-        return Specification.where(checkByUserIds(adminParameter.getUsers()))
-                .and(checkStates(adminParameter.getStates()))
-                .and(checkCategories(adminParameter.getCategories()))
-                .and(checkRangeStart(adminParameter.getRangeStart()))
-                .and(checkRangeEnd(adminParameter.getRangeEnd()));
+    private Specification<Event> getSpecification(final AdminParameterDto adminParameterDto) {
+        return Specification.where(checkByUserIds(adminParameterDto.getUsers()))
+                .and(checkStates(adminParameterDto.getStates()))
+                .and(checkCategories(adminParameterDto.getCategories()))
+                .and(checkRangeStart(adminParameterDto.getRangeStart()))
+                .and(checkRangeEnd(adminParameterDto.getRangeEnd()));
     }
 
-    private BooleanExpression getPredicate(final AdminParameter adminParameter) {
+    private BooleanExpression getPredicate(final AdminParameterDto adminParameterDto) {
         BooleanExpression predicate = event.isNotNull();
 
-        if (!ObjectUtils.isEmpty(adminParameter.getUsers())) {
-            predicate = predicate.and(event.initiatorId.in(adminParameter.getUsers()));
+        if (!ObjectUtils.isEmpty(adminParameterDto.getUsers())) {
+            predicate = predicate.and(event.initiatorId.in(adminParameterDto.getUsers()));
         }
 
-        if (!ObjectUtils.isEmpty(adminParameter.getStates())) {
-            predicate = predicate.and(event.state.in(adminParameter.getStates()));
+        if (!ObjectUtils.isEmpty(adminParameterDto.getStates())) {
+            predicate = predicate.and(event.state.in(adminParameterDto.getStates()));
         }
 
-        if (!ObjectUtils.isEmpty(adminParameter.getCategories())) {
-            predicate = predicate.and(event.categoryId.in(adminParameter.getCategories()));
+        if (!ObjectUtils.isEmpty(adminParameterDto.getCategories())) {
+            predicate = predicate.and(event.categoryId.in(adminParameterDto.getCategories()));
         }
 
-        predicate = predicate.and(event.createdOn.between(adminParameter.getRangeStart(), adminParameter.getRangeEnd()));
+        predicate = predicate.and(event.createdOn.between(adminParameterDto.getRangeStart(), adminParameterDto.getRangeEnd()));
 
         return predicate;
     }

@@ -10,7 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.event.api.PublicEventApi;
 import ru.yandex.practicum.event.model.Event;
-import ru.yandex.practicum.event.model.PublicParameter;
+import ru.yandex.practicum.event.model.dto.PublicParameterDto;
 import ru.yandex.practicum.event.model.dto.EventDto;
 import ru.yandex.practicum.location.validation.ConstraintNotZero;
 import ru.yandex.practicum.service.EventService;
@@ -33,10 +33,10 @@ public class PublicEventController implements PublicEventApi {
     }
 
     @GetMapping
-    public List<EventDto> getAll(@Valid final PublicParameter publicParameter,
+    public List<EventDto> getAll(@Valid final PublicParameterDto publicParameterDto,
                                  final HttpServletRequest request) {
-        log.info("Public {} request with parameters - {}", SIMPLE_NAME, publicParameter);
-        return eventService.getAll(publicParameter, request);
+        log.info("Public {} request with parameters - {}", SIMPLE_NAME, publicParameterDto);
+        return eventService.getAll(publicParameterDto, request);
     }
 
     @GetMapping("/locations")

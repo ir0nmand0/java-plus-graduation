@@ -19,7 +19,8 @@
     </properties>
 
     <modules>
-        <module>common</module>
+        <module>module-dto</module>
+        <module>common-src</module>
         <module>category-service</module>
         <module>compilation-service</module>
         <module>event-service</module>

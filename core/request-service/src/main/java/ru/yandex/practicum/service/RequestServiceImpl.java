@@ -144,8 +144,10 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<Request> findAllByIdInAndEventId(Set<Long> requestIds, long eventId) {
-        return requestStorage.findAllByIdInAndEventId(requestIds, eventId);
+    public List<RequestDto> findAllByIdInAndEventId(Set<Long> requestIds, long eventId) {
+        return requestStorage.findAllByIdInAndEventId(requestIds, eventId).stream()
+                .map(request -> cs.convert(request, RequestDto.class))
+                .toList();
     }
 
     @Override
@@ -154,7 +156,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public void saveAll(List<Request> requests) {
-        requestStorage.saveAll(requests);
+    public void saveAll(List<RequestDto> requests) {
+        requestStorage.saveAll(requests.stream().map(requestDto -> cs.convert(requestDto, Request.class)).toList());
     }
 }

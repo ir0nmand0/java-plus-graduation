@@ -16,9 +16,9 @@ public interface RequestService {
 
     List<RequestDto> findAllByEventId(long eventId);
 
-    List<Request> findAllByIdInAndEventId(Set<Long> requestIds, long eventId);
+    List<RequestDto> findAllByIdInAndEventId(Set<Long> requestIds, long eventId);
 
     int countByEventIdAndStatus(long eventId, State state);
 
-    void saveAll(List<Request> requests);
+    void saveAll(List<RequestDto> requests);
 }

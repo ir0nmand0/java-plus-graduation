@@ -114,9 +114,16 @@
         </dependency>
 
         <!-- Внутренние зависимости -->
+
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>module-dto</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>common-src</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
 
