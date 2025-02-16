@@ -10,7 +10,7 @@ import ru.yandex.practicum.dto.StatCountHitsDto;
 import ru.yandex.practicum.dto.StatDto;
 import ru.yandex.practicum.dto.StatsResponseHitDto;
 import ru.yandex.practicum.mapper.StatsMapper;
-import ru.yandex.practicum.model.Stat;
+import ru.yandex.practicum.entity.Stat;
 import ru.yandex.practicum.storage.StatsStorage;
 
 import java.util.List;

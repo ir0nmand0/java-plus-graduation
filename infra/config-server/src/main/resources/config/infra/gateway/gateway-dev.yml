@@ -9,20 +9,70 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
-        - id: main-service
-          uri: lb://MAIN-SERVICE
+        - id: category-service
+          uri: lb://category-service
           predicates:
-            - Path=/admin/**, /users/**, /events/**, /categories/**, /compilations/**, /locations/**
+            - Path=/categories/**, /admin/categories/**
           filters:
             - name: CircuitBreaker
               args:
-                name: ewm-service
-                fallbackUri: forward:/fallback/ewm-service
+                name: category-service
+                fallbackUri: forward:/fallback/category-service
+
+        - id: compilation-service
+          uri: lb://compilation-service
+          predicates:
+            - Path=/admin/compilations/**, /compilations/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: compilation-service
+                fallbackUri: forward:/fallback/compilation-service
+
+        - id: event-service
+          uri: lb://event-service
+          predicates:
+            - Path=/events/**, /users/{userId}/events/**, /admin/events/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: event-service
+                fallbackUri: forward:/fallback/event-service
+
+        - id: location-service
+          uri: lb://location-service
+          predicates:
+            - Path=/locations/**, /admin/locations/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: location-service
+                fallbackUri: forward:/fallback/location-service
+
+        - id: request-service
+          uri: lb://request-service
+          predicates:
+            - Path=/users/{userId}/requests/**, /users/{userId}/events/{eventId}/requests/**, /requests/events/{eventId}/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: request-service
+                fallbackUri: forward:/fallback/request-service
+
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/admin/users/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: user-service
+                fallbackUri: forward:/fallback/user-service
 
         - id: stats-service
-          uri: lb://STATS-SERVER
+          uri: lb://stats-service
           predicates:
-            - Path=/hit, /stats
+            - Path=/hit/**, /stats/**
           filters:
             - name: CircuitBreaker
               args:
@@ -39,7 +89,17 @@ resilience4j:
         permittedNumberOfCallsInHalfOpenState: 5
         registerHealthIndicator: true
     instances:
-      ewm-service:
+      category-service:
+        baseConfig: default
+      compilation-service:
+        baseConfig: default
+      event-service:
+        baseConfig: default
+      location-service:
+        baseConfig: default
+      request-service:
+        baseConfig: default
+      user-service:
         baseConfig: default
       stats-service:
         baseConfig: default

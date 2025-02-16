@@ -19,7 +19,13 @@
     </properties>
 
     <modules>
-        <module>main-service</module>
+        <module>core-dto</module>
+        <module>category-service</module>
+        <module>compilation-service</module>
+        <module>event-service</module>
+        <module>location-service</module>
+        <module>request-service</module>
+        <module>user-service</module>
     </modules>
 
 </project>

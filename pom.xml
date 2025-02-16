@@ -27,6 +27,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<mapstruct.version>1.5.5.Final</mapstruct.version>
 		<spring-cloud-dependencies.version>2023.0.3</spring-cloud-dependencies.version>
+		<lombok.version>1.18.32</lombok.version>
+		<querydsl.version>5.0.0</querydsl.version>
 	</properties>
 
 	<dependencyManagement>
@@ -47,6 +49,26 @@
 				<groupId>org.mapstruct</groupId>
 				<artifactId>mapstruct-processor</artifactId>
 				<version>${mapstruct.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+				<version>${lombok.version}</version>
+				<scope>provided</scope>
+				<optional>true</optional>
+			</dependency>
+			<dependency>
+				<groupId>com.querydsl</groupId>
+				<artifactId>querydsl-apt</artifactId>
+				<version>${querydsl.version}</version>
+				<classifier>jakarta</classifier>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.querydsl</groupId>
+				<artifactId>querydsl-jpa</artifactId>
+				<classifier>jakarta</classifier>
+				<version>${querydsl.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
