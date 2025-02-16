@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dto.StatCountHitsDto;
-import ru.yandex.practicum.model.Stat;
+import ru.yandex.practicum.entity.Stat;
 import ru.yandex.practicum.storage.StatsStorage;
 
 import java.time.LocalDateTime;

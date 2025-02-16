@@ -6,7 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.exception.type.NotFoundException;
-import ru.yandex.practicum.location.model.Location;
+import ru.yandex.practicum.entity.Location;
 import ru.yandex.practicum.storage.LocationStorage;
 
 import java.util.List;

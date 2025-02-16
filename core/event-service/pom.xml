@@ -116,13 +116,14 @@
         <!-- Внутренние зависимости -->
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>module-dto</artifactId>
+            <artifactId>core-dto</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
 
+
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>common-src</artifactId>
+            <artifactId>stats-dto</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
 

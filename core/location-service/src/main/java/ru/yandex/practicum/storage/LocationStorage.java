@@ -1,6 +1,6 @@
 package ru.yandex.practicum.storage;
 
-import ru.yandex.practicum.location.model.Location;
+import ru.yandex.practicum.entity.Location;
 
 import java.util.List;
 import java.util.Optional;

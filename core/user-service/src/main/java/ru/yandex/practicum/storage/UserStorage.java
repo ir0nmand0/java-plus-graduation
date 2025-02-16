@@ -1,6 +1,6 @@
 package ru.yandex.practicum.storage;
 
-import ru.yandex.practicum.user.model.User;
+import ru.yandex.practicum.entity.User;
 
 import java.util.List;
 import java.util.Optional;

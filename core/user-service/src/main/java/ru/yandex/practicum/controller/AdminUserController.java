@@ -10,7 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.service.UserService;
 import ru.yandex.practicum.user.api.AdminUserApi;
-import ru.yandex.practicum.user.model.User;
+import ru.yandex.practicum.entity.User;
 import ru.yandex.practicum.user.model.dto.CreateUserDto;
 import ru.yandex.practicum.user.model.dto.UserDto;
 

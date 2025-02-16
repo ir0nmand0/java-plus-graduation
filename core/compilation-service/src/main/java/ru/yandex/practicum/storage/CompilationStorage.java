@@ -1,7 +1,7 @@
 package ru.yandex.practicum.storage;
 
 import org.springframework.data.domain.PageRequest;
-import ru.yandex.practicum.compilation.model.Compilation;
+import ru.yandex.practicum.entity.Compilation;
 
 import java.util.List;
 import java.util.Optional;

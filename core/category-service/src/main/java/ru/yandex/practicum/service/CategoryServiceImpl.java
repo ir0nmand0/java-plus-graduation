@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.category.model.Category;
+import ru.yandex.practicum.entity.Category;
 import ru.yandex.practicum.category.model.dto.CategoryDto;
 import ru.yandex.practicum.category.model.dto.CreateCategoryDto;
 import ru.yandex.practicum.event.client.AdminEventClient;

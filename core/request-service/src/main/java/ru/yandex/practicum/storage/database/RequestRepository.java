@@ -1,7 +1,7 @@
 package ru.yandex.practicum.storage.database;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.yandex.practicum.request.model.Request;
+import ru.yandex.practicum.entity.Request;
 import ru.yandex.practicum.state.State;
 
 import java.util.List;

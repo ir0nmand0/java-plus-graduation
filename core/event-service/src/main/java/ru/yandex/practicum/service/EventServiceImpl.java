@@ -12,13 +12,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import ru.yandex.practicum.SearchStats;
 import ru.yandex.practicum.category.client.PublicCategoryClient;
-import ru.yandex.practicum.category.model.Category;
 import ru.yandex.practicum.category.model.dto.CategoryDto;
 import ru.yandex.practicum.client.StatsClient;
 import ru.yandex.practicum.dto.CreateStatsDto;
 import ru.yandex.practicum.dto.StatCountHitsDto;
 import ru.yandex.practicum.event.model.dto.AdminParameterDto;
-import ru.yandex.practicum.event.model.Event;
+import ru.yandex.practicum.entity.Event;
 import ru.yandex.practicum.event.model.dto.PublicParameterDto;
 import ru.yandex.practicum.event.model.dto.CreateEventDto;
 import ru.yandex.practicum.event.model.dto.EventDto;
@@ -26,17 +25,14 @@ import ru.yandex.practicum.event.model.dto.UpdateEventDto;
 import ru.yandex.practicum.exception.type.ConflictException;
 import ru.yandex.practicum.exception.type.NotFoundException;
 import ru.yandex.practicum.location.client.AdminLocationClient;
-import ru.yandex.practicum.location.model.Location;
 import ru.yandex.practicum.location.model.dto.LocationDto;
 import ru.yandex.practicum.request.client.PrivateUserRequestClient;
-import ru.yandex.practicum.request.model.Request;
 import ru.yandex.practicum.request.model.dto.RequestDto;
 import ru.yandex.practicum.request.model.dto.RequestStatusUpdateResultDto;
 import ru.yandex.practicum.request.model.dto.UpdateRequestByIdsDto;
 import ru.yandex.practicum.state.State;
 import ru.yandex.practicum.storage.EventStorage;
 import ru.yandex.practicum.user.client.AdminUserClient;
-import ru.yandex.practicum.user.model.User;
 import ru.yandex.practicum.user.model.dto.UserDto;
 import ru.yandex.practicum.user.model.dto.UserWithoutEmailDto;
 
@@ -48,7 +44,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static ru.yandex.practicum.event.model.QEvent.event;
+import static ru.yandex.practicum.entity.QEvent.event;
 
 
 @Slf4j
@@ -255,44 +251,38 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventDto create(final CreateEventDto createEventDto, final long userId) {
         final UserDto userDto = adminUserClient.getById(userId);
-
         if (ObjectUtils.isEmpty(userDto)) {
             throw new NotFoundException(SIMPLE_NAME, userId);
         }
 
-        final User user = cs.convert(userDto, User.class);
-
         final CategoryDto categoryDto = publicCategoryClient.getById(createEventDto.category());
-
         if (ObjectUtils.isEmpty(categoryDto)) {
             throw new NotFoundException(SIMPLE_NAME, createEventDto.category());
         }
 
-        final Category category = cs.convert(categoryDto, Category.class);
+        final LocationDto locationDto = adminLocationClient.getByCoordinatesOrElseCreate(createEventDto.location());
 
-        final Location location = cs.convert(adminLocationClient.getByCoordinatesOrElseCreate(createEventDto.location()),
-                Location.class);
-
+        // Создаем сущность Event на основе DTO createEventDto
         Event event = cs.convert(createEventDto, Event.class);
-
-        event.setInitiatorId(user.getId());
-        event.setCategoryId(category.getId());
-        event.setLocationId(location.getId());
+        // Заполняем идентификаторы, используя данные из DTO
+        event.setInitiatorId(userDto.id());
+        event.setCategoryId(categoryDto.id());
+        event.setLocationId(locationDto.id());
         event.setCreatedOn(LocalDateTime.now());
         event.setState(State.PENDING);
 
-        Event save = eventStorage.save(event);
+        Event savedEvent = eventStorage.save(event);
 
-        EventDto eventDto = cs.convert(save, EventDto.class);
-
+        EventDto eventDto = cs.convert(savedEvent, EventDto.class);
         UserWithoutEmailDto withoutEmailDto = cs.convert(userDto, UserWithoutEmailDto.class);
 
         eventDto.setCategory(categoryDto);
         eventDto.setInitiator(withoutEmailDto);
-        eventDto.setLocation(cs.convert(location, LocationDto.class));
+        eventDto.setLocation(locationDto);
 
         return eventDto;
     }
+
 
     @Override
     public List<EventDto> getAllByUserId(final long userId, final int from, final int size) {
@@ -388,10 +378,8 @@ public class EventServiceImpl implements EventService {
     public RequestStatusUpdateResultDto updateRequestsStatusByUserIdAndEventId(final long userId, final long eventId,
                                                                                UpdateRequestByIdsDto update) {
 
-        List<Request> requests = privateUserRequestClient
-                .findAllByIdInAndEventId(userId, update.requestIds(), eventId).stream()
-                .map(requestDto -> cs.convert(requestDto, Request.class))
-                .toList();
+        List<RequestDto> requests = privateUserRequestClient
+                .findAllByIdInAndEventId(userId, update.requestIds(), eventId);
 
         if (ObjectUtils.isEmpty(requests)) {
             throw new NotFoundException("No requests found for event id " + eventId);
@@ -404,17 +392,18 @@ public class EventServiceImpl implements EventService {
                 .rejectedRequests(new ArrayList<>())
                 .build();
 
-        List<Request> requestsForSave = new ArrayList<>();
+        List<RequestDto> requestsForSave = new ArrayList<>();
 
-        for (Request request : requests) {
+        for (RequestDto request : requests) {
             if (request.getStatus() != State.PENDING) {
                 throw new ConflictException(
                         "The status can only be changed for applications that are in a pending state"
                 );
             }
 
-            Event event = eventStorage.getById(request.getEventId())
-                    .orElseThrow(() -> new NotFoundException(SIMPLE_NAME, request.getEventId()));
+            // Получаем данные события по идентификатору, который хранится в request.getEvent()
+            Event event = eventStorage.getById(request.getEvent())
+                    .orElseThrow(() -> new NotFoundException(SIMPLE_NAME, request.getEvent()));
 
             if (countRequest >= event.getParticipantLimit()) {
                 throw new ConflictException("The limit on applications for this event has been reached");
@@ -430,26 +419,22 @@ public class EventServiceImpl implements EventService {
                 requestsForSave.add(request);
 
                 if (update.status() == State.CONFIRMED) {
-                    result.confirmedRequests().add(cs.convert(request, RequestDto.class));
+                    result.confirmedRequests().add(request);
                 }
 
                 if (update.status() == State.REJECTED) {
-                    result.rejectedRequests().add(cs.convert(request, RequestDto.class));
+                    result.rejectedRequests().add(request);
                 }
             }
         }
 
         if (!requestsForSave.isEmpty()) {
-
-            List<RequestDto> requestDtos = requestsForSave.stream()
-                    .map(requestDto -> cs.convert(requestDto, RequestDto.class))
-                    .toList();
-
-            privateUserRequestClient.saveAll(userId, requestDtos);
+            privateUserRequestClient.saveAll(userId, requestsForSave);
         }
 
         return result;
     }
+
 
     @Override
     public EventDto getById(final long eventId, final HttpServletRequest request) {

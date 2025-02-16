@@ -9,16 +9,14 @@ import org.springframework.util.ObjectUtils;
 import ru.yandex.practicum.category.client.PublicCategoryClient;
 import ru.yandex.practicum.category.model.dto.CategoryDto;
 import ru.yandex.practicum.event.client.AdminEventClient;
-import ru.yandex.practicum.event.model.Event;
 import ru.yandex.practicum.event.model.dto.EventDto;
 import ru.yandex.practicum.exception.type.ConflictException;
 import ru.yandex.practicum.exception.type.NotFoundException;
-import ru.yandex.practicum.request.model.Request;
+import ru.yandex.practicum.entity.Request;
 import ru.yandex.practicum.request.model.dto.RequestDto;
 import ru.yandex.practicum.state.State;
 import ru.yandex.practicum.storage.RequestStorage;
 import ru.yandex.practicum.user.client.AdminUserClient;
-import ru.yandex.practicum.user.model.User;
 import ru.yandex.practicum.user.model.dto.UserDto;
 import ru.yandex.practicum.user.model.dto.UserWithoutEmailDto;
 
@@ -41,63 +39,57 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public RequestDto create(final long userId, final long eventId) {
         requestStorage.ifExistsByRequesterIdAndEventIdThenThrow(userId, eventId);
-        final UserDto userDto = adminUserClient.getById(userId);
 
+        final UserDto userDto = adminUserClient.getById(userId);
         if (ObjectUtils.isEmpty(userDto)) {
             throw new NotFoundException(SIMPLE_NAME, userId);
         }
 
-        User user = cs.convert(userDto, User.class);
-
-        EventDto first = adminEventClient.getAllByIds(Set.of(eventId)).getFirst();
+        // Получаем EventDto напрямую
+        EventDto eventDto = adminEventClient.getAllByIds(Set.of(eventId)).getFirst();
+        if (ObjectUtils.isEmpty(eventDto)) {
+            throw new NotFoundException(SIMPLE_NAME, eventId);
+        }
 
         log.info("Create request for user {} with id {} and event {} and initiator {}",
-                userDto, user.getId(), first.getId(), first.getInitiator().id());
+                userDto, userDto.id(), eventDto.getId(), eventDto.getInitiator().id());
 
-        Event event = cs.convert(first, Event.class);
-
-        event.setInitiatorId(first.getInitiator().id());
-
-        if (ObjectUtils.isEmpty(event)) {
-            throw new NotFoundException(SIMPLE_NAME, userId);
+        // Проверяем, что пользователь не является инициатором события
+        if (eventDto.getInitiator().id() == userDto.id()) {
+            throw new ConflictException("%s : can`t add a request to your own: %d eventId: %d"
+                    .formatted(SIMPLE_NAME, userId, eventId));
         }
 
-
-        if (event.getInitiatorId() == user.getId()) {
-            throw new ConflictException("%s : can`t add a request to your own: %d eventId: %d".formatted(SIMPLE_NAME,
-                    userId, eventId));
-        }
-
-        if (event.getState() != State.PUBLISHED) {
+        if (eventDto.getState() != State.PUBLISHED) {
             throw new ConflictException("Cannot add a request to an unpublished eventId: %d".formatted(eventId));
-        } else if (event.getParticipantLimit() != 0
-                && requestStorage.countByEventIdAndStatus(event.getId(), State.CONFIRMED) >= event.getParticipantLimit()) {
+        } else if (eventDto.getParticipantLimit() != 0
+                && requestStorage.countByEventIdAndStatus(eventDto.getId(), State.CONFIRMED) >= eventDto.getParticipantLimit()) {
             throw new ConflictException("Event participation limit exceeded eventId: %d".formatted(eventId));
         }
 
+        // Создаем запрос, используя данные из DTO
         Request request = Request.builder()
                 .created(LocalDateTime.now())
-                .eventId(event.getId())
-                .requesterId(user.getId())
-                .status(event.getParticipantLimit() == 0 || !event.isRequestModeration() ? State.CONFIRMED
-                        : State.PENDING)
+                .eventId(eventDto.getId())
+                .requesterId(userDto.id())
+                .status(eventDto.getParticipantLimit() == 0 || !eventDto.isRequestModeration() ? State.CONFIRMED : State.PENDING)
                 .build();
 
+        // Если запрос подтвержден, обновляем данные события через DTO
         if (request.getStatus() == State.CONFIRMED) {
-            event.setConfirmedRequests(event.getConfirmedRequests() + 1);
+            eventDto.setConfirmedRequests(eventDto.getConfirmedRequests() + 1);
 
-            CategoryDto categoryDto = publicCategoryClient.getById(event.getCategoryId());
-
-            EventDto eventDto = cs.convert(event, EventDto.class);
-
+            CategoryDto categoryDto = publicCategoryClient.getById(eventDto.getCategory().id());
             eventDto.setCategory(categoryDto);
-            eventDto.setInitiator(cs.convert(user, UserWithoutEmailDto.class));
+            UserWithoutEmailDto initiatorDto = cs.convert(userDto, UserWithoutEmailDto.class);
+            eventDto.setInitiator(initiatorDto);
 
             adminEventClient.save(eventDto);
         }
 
         return cs.convert(requestStorage.save(request), RequestDto.class);
     }
+
 
     @Override
     public List<RequestDto> getAll(final long userId) {
@@ -109,7 +101,6 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public RequestDto cancel(final long userId, final long requestId) {
         final UserDto userDto = adminUserClient.getById(userId);
-
         if (ObjectUtils.isEmpty(userDto)) {
             throw new NotFoundException(SIMPLE_NAME, userId);
         }
@@ -117,16 +108,18 @@ public class RequestServiceImpl implements RequestService {
         Request request = requestStorage.getByIdOrElseThrow(requestId);
 
         if (request.getStatus() == State.CONFIRMED) {
-            Event event = cs.convert(adminEventClient.getAllByIds(Set.of(request.getEventId())).getFirst(), Event.class);
-            event.setConfirmedRequests(event.getConfirmedRequests() - 1);
-            event.setInitiatorId(userId);
+            // Получаем EventDto напрямую
+            EventDto eventDto = adminEventClient.getAllByIds(Set.of(request.getEventId())).getFirst();
 
-            CategoryDto categoryDto = publicCategoryClient.getById(event.getCategoryId());
+            // Обновляем количество подтвержденных запросов
+            eventDto.setConfirmedRequests(eventDto.getConfirmedRequests() - 1);
 
-            EventDto eventDto = cs.convert(event, EventDto.class);
-
-            eventDto.setCategory(categoryDto);
+            // Обновляем инициатора через DTO
             eventDto.setInitiator(cs.convert(userDto, UserWithoutEmailDto.class));
+
+            // Получаем и устанавливаем категорию
+            CategoryDto categoryDto = publicCategoryClient.getById(eventDto.getCategory().id());
+            eventDto.setCategory(categoryDto);
 
             adminEventClient.save(eventDto);
         }
@@ -135,6 +128,7 @@ public class RequestServiceImpl implements RequestService {
 
         return cs.convert(requestStorage.save(request), RequestDto.class);
     }
+
 
     @Override
     public List<RequestDto> findAllByEventId(long eventId) {

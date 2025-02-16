@@ -3,7 +3,7 @@ package ru.yandex.practicum.storage.database;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ru.yandex.practicum.dto.StatCountHitsDto;
-import ru.yandex.practicum.model.Stat;
+import ru.yandex.practicum.entity.Stat;
 
 import java.time.LocalDateTime;
 import java.util.List;

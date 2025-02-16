@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import ru.yandex.practicum.exception.type.NotFoundException;
 import ru.yandex.practicum.storage.UserStorage;
-import ru.yandex.practicum.user.model.User;
+import ru.yandex.practicum.entity.User;
 
 import java.util.List;
 import java.util.Optional;

@@ -9,7 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.event.api.AdminEventApi;
 import ru.yandex.practicum.event.model.dto.AdminParameterDto;
-import ru.yandex.practicum.event.model.Event;
+import ru.yandex.practicum.entity.Event;
 import ru.yandex.practicum.event.model.dto.EventDto;
 import ru.yandex.practicum.event.model.dto.UpdateEventDto;
 import ru.yandex.practicum.service.EventService;

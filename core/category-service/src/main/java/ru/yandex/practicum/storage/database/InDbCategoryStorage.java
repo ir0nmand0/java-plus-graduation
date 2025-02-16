@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.category.model.Category;
+import ru.yandex.practicum.entity.Category;
 import ru.yandex.practicum.exception.type.NotFoundException;
 import ru.yandex.practicum.storage.CategoryStorage;
 

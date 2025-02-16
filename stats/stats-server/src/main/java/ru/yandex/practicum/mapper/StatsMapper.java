@@ -6,7 +6,7 @@ import ru.yandex.practicum.dto.CreateStatsDto;
 import ru.yandex.practicum.dto.StatCountHitsDto;
 import ru.yandex.practicum.dto.StatDto;
 import ru.yandex.practicum.dto.StatsResponseHitDto;
-import ru.yandex.practicum.model.Stat;
+import ru.yandex.practicum.entity.Stat;
 
 @Mapper(componentModel = "spring")
 public abstract class StatsMapper {

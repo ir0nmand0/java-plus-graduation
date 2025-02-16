@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
-import ru.yandex.practicum.location.model.Location;
+import ru.yandex.practicum.entity.Location;
 import ru.yandex.practicum.location.model.dto.CreateLocationDto;
 import ru.yandex.practicum.location.model.dto.LocationDto;
 import ru.yandex.practicum.location.model.dto.LocationLatAndLonDto;

@@ -2,7 +2,7 @@ package ru.yandex.practicum.storage.database;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.yandex.practicum.location.model.Location;
+import ru.yandex.practicum.entity.Location;
 
 import java.util.List;
 import java.util.Optional;

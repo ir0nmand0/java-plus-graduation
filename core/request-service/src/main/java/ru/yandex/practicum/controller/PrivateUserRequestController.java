@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.request.api.PrivateUserRequestApi;
-import ru.yandex.practicum.request.model.Request;
+import ru.yandex.practicum.entity.Request;
 import ru.yandex.practicum.request.model.dto.RequestDto;
 import ru.yandex.practicum.service.RequestService;
 import ru.yandex.practicum.state.State;

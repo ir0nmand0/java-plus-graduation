@@ -1,6 +1,5 @@
 package ru.yandex.practicum.service;
 
-import ru.yandex.practicum.request.model.Request;
 import ru.yandex.practicum.request.model.dto.RequestDto;
 import ru.yandex.practicum.state.State;
 

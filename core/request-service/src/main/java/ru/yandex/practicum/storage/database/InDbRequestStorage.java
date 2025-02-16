@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.exception.type.ConflictException;
 import ru.yandex.practicum.exception.type.NotFoundException;
-import ru.yandex.practicum.request.model.Request;
+import ru.yandex.practicum.entity.Request;
 import ru.yandex.practicum.state.State;
 import ru.yandex.practicum.storage.RequestStorage;
 

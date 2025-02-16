@@ -8,12 +8,11 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
-import ru.yandex.practicum.compilation.model.Compilation;
+import ru.yandex.practicum.entity.Compilation;
 import ru.yandex.practicum.compilation.model.dto.CompilationDto;
 import ru.yandex.practicum.compilation.model.dto.CreateCompilationDto;
 import ru.yandex.practicum.compilation.model.dto.UpdateCompilationDto;
 import ru.yandex.practicum.event.client.AdminEventClient;
-import ru.yandex.practicum.event.model.Event;
 import ru.yandex.practicum.event.model.dto.EventDto;
 import ru.yandex.practicum.exception.type.NotFoundException;
 import ru.yandex.practicum.storage.CompilationStorage;
@@ -34,29 +33,24 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto create(final CreateCompilationDto createCompilationDto) {
         Compilation compilation = cs.convert(createCompilationDto, Compilation.class);
 
-        List<Event> eventList = new ArrayList<>();
-
         List<EventDto> events = null;
 
         if (!ObjectUtils.isEmpty(createCompilationDto.events())) {
-
             events = adminEventClient.getAllByIds(createCompilationDto.events());
 
             if (!ObjectUtils.isEmpty(events) && events.size() != createCompilationDto.events().size()) {
                 throw new NotFoundException("the number of events found does not correspond to the requirements");
             }
 
-            events.forEach(eventDto -> eventList.add(cs.convert(eventDto, Event.class)));
-
-            List<Long> ids = eventList.stream()
-                    .map(Event::getId)
+            // Извлекаем только идентификаторы из EventDto
+            List<Long> ids = events.stream()
+                    .map(EventDto::getId)
                     .toList();
 
             compilation.setEventIds(ids);
         }
 
         CompilationDto compilationDto = cs.convert(compilationStorage.save(compilation), CompilationDto.class);
-
         compilationDto.setEvents(ObjectUtils.isEmpty(events) ? List.of() : events);
 
         return compilationDto;
@@ -74,28 +68,22 @@ public class CompilationServiceImpl implements CompilationService {
             compilationInStorage.setTitle(compilationInStorage.getTitle());
         }
 
-        List<Event> eventList = new ArrayList<>();
-
         List<EventDto> events = null;
 
         if (!ObjectUtils.isEmpty(updateCompilationDto.events())) {
             events = adminEventClient.getAllByIds(updateCompilationDto.events());
 
-            events.forEach(eventDto -> eventList.add(cs.convert(eventDto, Event.class)));
-
-            List<Long> ids = eventList.stream()
-                    .map(Event::getId)
+            List<Long> ids = events.stream()
+                    .map(EventDto::getId)
                     .toList();
 
             // Создаем новый ArrayList перед сохранением, чтобы Hibernate смог обновить коллекцию
-            // (очистить старые значения и добавить новые)
             compilationInStorage.setEventIds(new ArrayList<>(ids));
         }
 
         log.info("Update compilation - {}", compilationInStorage);
 
         CompilationDto compilationDto = cs.convert(compilationStorage.save(compilationInStorage), CompilationDto.class);
-
         compilationDto.setEvents(ObjectUtils.isEmpty(events) ? List.of() : events);
 
         return compilationDto;
