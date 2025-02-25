@@ -22,6 +22,9 @@ spring:
             - classpath:config/core/user-service
             - classpath:config/stats/stats-server
             - classpath:config/infra/gateway
+            - classpath:config/recommendation/aggregator
+            - classpath:config/recommendation/analyzer
+            - classpath:config/recommendation/collector
 
 # Настройки Eureka, чтобы Config Server искал и регистрировался
 eureka:

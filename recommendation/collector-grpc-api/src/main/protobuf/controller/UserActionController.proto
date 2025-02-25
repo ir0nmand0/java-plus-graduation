@@ -1,0 +1,26 @@
+// Определяет версию протокола буфера, которая используется в этом файле
+syntax = "proto3";
+
+// Импортирует стандартный тип данных timestamp из библиотеки Google Protocol Buffers
+import "google/protobuf/timestamp.proto";
+// Импортирует стандартный пустой тип ответа из библиотеки Google Protocol Buffers
+import "google/protobuf/empty.proto";
+// Импортирует файл, содержащий определение сообщения UserActionProto
+import "message/UserActionProto.proto";
+
+// Определяет Java пакет, в котором будут размещены сгенерированные классы
+option java_package = "ru.yandex.practicum.grpc.collector.controller";
+// Определяет имя внешнего класса Java, который будет содержать все объявления из этого файла
+option java_outer_classname = "UserActionControllerProto";
+
+// Определяет пространство имен для всех типов данных в этом файле
+package collector;
+
+// Описывает gRPC сервис для обработки действий пользователя
+service UserActionController {
+  // Определяет RPC метод для сбора действий пользователя
+  // Принимает объект UserActionProto в качестве параметра
+  // Возвращает пустой ответ, так как обработка происходит асинхронно 
+  // и клиенту не требуется ждать результата обработки
+  rpc CollectUserAction (UserActionProto) returns (google.protobuf.Empty);
+}
