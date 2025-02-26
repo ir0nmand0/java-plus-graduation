@@ -52,12 +52,6 @@ services:
         condition: service_healthy
       user-service:
         condition: service_healthy
-      aggregator-service:
-        condition: service_healthy
-      analyzer-service:
-        condition: service_healthy
-      collector-service:
-        condition: service_healthy
     networks:
       - ewm-net
     environment:
@@ -69,14 +63,6 @@ services:
       timeout: 5s
       interval: 20s
       retries: 5
-      # Добавляем задержку 120 секунд перед началом проверок работоспособности gateway-сервера.
-      # Это необходимо, чтобы дать всем микросервисам достаточно времени для:
-      # 1. Регистрации в сервисе обнаружения Eureka
-      # 2. Обновления реестра сервисов в каждом микросервисе
-      # 3. Корректной настройки маршрутизации запросов
-      # Без этой задержки тесты могут начаться до того, как все сервисы обнаружат друг друга,
-      # что приводит к ошибкам 404 при запросах между микросервисами.
-      start_period: 120s
 
   stats-server:
     build: stats/stats-server
@@ -349,11 +335,13 @@ services:
       timeout: 10s
       retries: 3
 
-  # Рекомендательные сервисы
+  # Рекомендательные сервисы (зависят от gateway-server)
   collector-service:
     build: recommendation/collector
     container_name: ewm-collector-service
     depends_on:
+      gateway-server:
+        condition: service_healthy
       config-server:
         condition: service_healthy
       discovery-server:
@@ -374,6 +362,8 @@ services:
     build: recommendation/aggregator
     container_name: ewm-aggregator-service
     depends_on:
+      gateway-server:
+        condition: service_healthy
       schema-registry:
         condition: service_healthy
       config-server:
@@ -396,6 +386,8 @@ services:
     build: recommendation/analyzer
     container_name: ewm-analyzer-service
     depends_on:
+      gateway-server:
+        condition: service_healthy
       analyzer-db:
         condition: service_healthy
       config-server:
