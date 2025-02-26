@@ -52,12 +52,6 @@ services:
         condition: service_healthy
       user-service:
         condition: service_healthy
-      aggregator-service:
-        condition: service_healthy
-      analyzer-service:
-        condition: service_healthy
-      collector-service:
-        condition: service_healthy
     networks:
       - ewm-net
     environment:
@@ -251,179 +245,6 @@ services:
       interval: 25s
       retries: 10
 
-  # Kafka и связанные сервисы
-  kafka:
-    image: confluentinc/confluent-local:7.8.0
-    hostname: kafka
-    container_name: kafka
-    ports:
-      - "${KAFKA_PORT:-9092}:9092"
-      - "${KAFKA_CONTROLLER_PORT:-29093}:29093"
-    networks:
-      - ewm-net
-    restart: unless-stopped
-    environment:
-      # Базовые настройки
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_DEFAULT_REPLICATION_FACTOR: 1
-      KAFKA_NODE_ID: 1
-
-      # Исправленные настройки слушателей - разные порты для разных интерфейсов
-      KAFKA_LISTENERS: 'PLAINTEXT://kafka:9092,CONTROLLER://kafka:29093,PLAINTEXT_HOST://0.0.0.0:29092'
-      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9092'
-
-      # Явно указываем карту протоколов для слушателей
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
-
-      # Остальные настройки
-      KAFKA_JMX_PORT: 9101
-      KAFKA_JMX_HOSTNAME: kafka
-      KAFKA_PROCESS_ROLES: 'broker,controller'
-      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:29093'
-      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
-      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
-      CLUSTER_ID: 'K0EA9p0yEe6MkAAAAkKsEg'
-
-      # Путь для хранения данных
-      KAFKA_LOG_DIRS: '/var/lib/kafka/data'
-    volumes:
-      - kafka-data:/var/lib/kafka/data
-    healthcheck:
-      test: [ "CMD", "kafka-topics", "--bootstrap-server", "kafka:9092", "--list" ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-
-  schema-registry:
-    image: confluentinc/cp-schema-registry:7.8.0
-    hostname: schema-registry
-    container_name: schema-registry
-    ports:
-      - "9102:9102"
-    networks:
-      - ewm-net
-    depends_on:
-      kafka:
-        condition: service_healthy
-    environment:
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'PLAINTEXT://kafka:9092'
-      SCHEMA_REGISTRY_HOST_NAME: 'schema-registry'
-      SCHEMA_REGISTRY_LISTENERS: 'http://0.0.0.0:9102'
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:9102/subjects" ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-
-  kafka-init-topics:
-    image: confluentinc/confluent-local:7.8.0
-    container_name: kafka-init-topics
-    depends_on:
-      kafka:
-        condition: service_healthy
-    command: >
-      bash -c '
-        echo "Waiting for Kafka to be ready..."
-        cub kafka-ready -b kafka:9092 1 30
-        echo "Creating topics..."
-        kafka-topics --create --if-not-exists --bootstrap-server kafka:9092 --topic stats.user-actions.v1 --partitions 1 --replication-factor 1
-        kafka-topics --create --if-not-exists --bootstrap-server kafka:9092 --topic stats.events-similarity.v1 --partitions 1 --replication-factor 1
-        echo "Topics created."
-      '
-    init: true
-    networks:
-      - ewm-net
-    healthcheck:
-      test: [ "CMD", "kafka-topics", "--bootstrap-server", "kafka:9092", "--list" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  # Рекомендательные сервисы
-  collector-service:
-    build: recommendation/collector
-    container_name: ewm-collector-service
-    depends_on:
-      config-server:
-        condition: service_healthy
-      discovery-server:
-        condition: service_healthy
-    networks:
-      - ewm-net
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
-      - SERVER_PORT=8087
-      - SPRING_PROFILES_ACTIVE=dev
-    healthcheck:
-      test: "curl --fail --silent collector-service:8087/actuator/health | grep UP || exit 1"
-      timeout: 5s
-      interval: 25s
-      retries: 10
-
-  aggregator-service:
-    build: recommendation/aggregator
-    container_name: ewm-aggregator-service
-    depends_on:
-      schema-registry:
-        condition: service_healthy
-      config-server:
-        condition: service_healthy
-      discovery-server:
-        condition: service_healthy
-    networks:
-      - ewm-net
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
-      - SERVER_PORT=8088
-      - SPRING_PROFILES_ACTIVE=dev
-    healthcheck:
-      test: "curl --fail --silent aggregator-service:8088/actuator/health | grep UP || exit 1"
-      timeout: 5s
-      interval: 25s
-      retries: 10
-
-  analyzer-service:
-    build: recommendation/analyzer
-    container_name: ewm-analyzer-service
-    depends_on:
-      analyzer-db:
-        condition: service_healthy
-      config-server:
-        condition: service_healthy
-      discovery-server:
-        condition: service_healthy
-    networks:
-      - ewm-net
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://analyzer-db:5432/analyzer-db
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
-      - SERVER_PORT=8089
-      - SPRING_PROFILES_ACTIVE=dev
-    healthcheck:
-      test: "curl --fail --silent analyzer-service:8089/actuator/health | grep UP || exit 1"
-      timeout: 5s
-      interval: 25s
-      retries: 10
-
-  analyzer-db:
-    image: postgres:16.1
-    container_name: postgres-analyzer-db
-    networks:
-      - ewm-net
-    environment:
-      - POSTGRES_PASSWORD=root
-      - POSTGRES_USER=root
-      - POSTGRES_DB=analyzer-db
-    healthcheck:
-      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
-      timeout: 5s
-      interval: 10s
-      retries: 15
-
   category-db:
     image: postgres:16.1
     container_name: postgres-category-db
@@ -438,6 +259,8 @@ services:
       timeout: 5s
       interval: 10s
       retries: 15
+
+
 
   compilation-db:
     image: postgres:16.1
@@ -469,6 +292,8 @@ services:
       interval: 10s
       retries: 15
 
+
+
   location-db:
     image: postgres:16.1
     container_name: postgres-location-db
@@ -483,6 +308,8 @@ services:
       timeout: 5s
       interval: 10s
       retries: 15
+
+
 
   request-db:
     image: postgres:16.1
@@ -499,6 +326,8 @@ services:
       interval: 10s
       retries: 15
 
+
+
   user-db:
     image: postgres:16.1
     container_name: postgres-user-db
@@ -514,27 +343,7 @@ services:
       interval: 10s
       retries: 15
 
-  service-sync:
-    image: alpine:latest
-    container_name: service-sync
-    command: >
-      sh -c "
-        echo 'Waiting for gateway to be fully operational...'
-        sleep 90
-        echo 'Making sure all services are registered in Eureka...'
-        sleep 90
-        echo 'Validating service discovery...'
-        wget -q --spider http://gateway-server:8080/actuator/health || exit 1
-        echo 'All services should now be properly registered and discoverable!'
-      "
-    depends_on:
-      gateway-server:
-        condition: service_healthy
-    networks:
-      - ewm-net
 
-volumes:
-  kafka-data:
 
 networks:
   ewm-net:
