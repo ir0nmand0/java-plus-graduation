@@ -70,12 +70,6 @@ BEFORE UPDATE ON event_similarities
 FOR EACH ROW
 EXECUTE FUNCTION update_modified_column();
 
--- Создание индекса на базе выражения для более быстрого поиска по дате (год, месяц)
-CREATE INDEX idx_user_actions_year_month ON user_actions (
-    EXTRACT(YEAR FROM timestamp),
-    EXTRACT(MONTH FROM timestamp)
-);
-
 -- Опционально: создание материализованного представления для частых запросов
 -- без автоматического обновления (для ручного обновления через приложение)
 CREATE MATERIALIZED VIEW mv_event_similarity_summary AS

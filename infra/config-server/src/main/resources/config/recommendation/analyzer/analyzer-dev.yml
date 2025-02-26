@@ -34,13 +34,6 @@ spring:
       max-lifetime: 1200000
       connection-test-query: SELECT 1
       leak-detection-threshold: 60000
-  sql:
-    init:
-      mode: always
-      platform: postgresql
-      schema-locations: classpath:schema.sql
-      data-locations: classpath:data.sql
-      continue-on-error: false
   jpa:
     hibernate:
       ddl-auto: none
