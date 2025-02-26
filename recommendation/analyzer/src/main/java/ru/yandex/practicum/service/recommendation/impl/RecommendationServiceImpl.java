@@ -2,7 +2,6 @@ package ru.yandex.practicum.service.recommendation.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.grpc.recommendation.InteractionsCountRequestProto;
@@ -10,12 +9,14 @@ import ru.yandex.practicum.grpc.recommendation.RecommendedEventProto;
 import ru.yandex.practicum.grpc.recommendation.SimilarEventsRequestProto;
 import ru.yandex.practicum.grpc.recommendation.UserPredictionsRequestProto;
 import ru.yandex.practicum.model.EventSimilarity;
-import ru.yandex.practicum.model.UserAction;
 import ru.yandex.practicum.repository.EventSimilarityRepository;
 import ru.yandex.practicum.repository.UserActionRepository;
 import ru.yandex.practicum.service.recommendation.RecommendationService;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
