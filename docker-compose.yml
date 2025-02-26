@@ -513,16 +513,16 @@ services:
       timeout: 5s
       interval: 10s
       retries: 15
-      
+
   service-sync:
     image: alpine:latest
     container_name: service-sync
     command: >
       sh -c "
         echo 'Waiting for gateway to be fully operational...'
-        sleep 30
+        sleep 90
         echo 'Making sure all services are registered in Eureka...'
-        sleep 30
+        sleep 90
         echo 'Validating service discovery...'
         wget -q --spider http://gateway-server:8080/actuator/health || exit 1
         echo 'All services should now be properly registered and discoverable!'
