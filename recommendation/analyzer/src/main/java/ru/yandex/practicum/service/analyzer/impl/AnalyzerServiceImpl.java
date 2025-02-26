@@ -54,7 +54,7 @@ public class AnalyzerServiceImpl implements AnalyzerService {
      */
     @Override
     public void saveUserAction(UserActionAvro userActionAvro) {
-        log.debug("Начало сохранения действия пользователя: {}", userActionAvro);
+        log.info("Начало сохранения действия пользователя: {}", userActionAvro);
 
         if (userActionAvro == null) {
             log.error("Получен null при попытке сохранить действие пользователя");
@@ -72,7 +72,7 @@ public class AnalyzerServiceImpl implements AnalyzerService {
             UserAction savedUserAction = userActionRepository.save(userAction);
             log.info("Успешно сохранено действие пользователя: userId={}, eventId={}, actionType={}",
                     savedUserAction.getUserId(), savedUserAction.getEventId(), savedUserAction.getActionType());
-            log.debug("Полные данные сохраненного действия: {}", savedUserAction);
+            log.info("Полные данные сохраненного действия: {}", savedUserAction);
         } catch (Exception e) {
             log.error("Ошибка при сохранении действия пользователя: {}", userActionAvro, e);
             throw e;
@@ -88,7 +88,7 @@ public class AnalyzerServiceImpl implements AnalyzerService {
      */
     @Override
     public void saveEventSimilarity(EventSimilarityAvro eventSimilarityAvro) {
-        log.debug("Начало сохранения сходства событий: {}", eventSimilarityAvro);
+        log.info("Начало сохранения сходства событий: {}", eventSimilarityAvro);
 
         if (eventSimilarityAvro == null) {
             log.error("Получен null при попытке сохранить сходство событий");
@@ -103,7 +103,7 @@ public class AnalyzerServiceImpl implements AnalyzerService {
                     .findByEventAAndEventB(eventA, eventB);
 
             if (eventSimilarityOpt.isPresent()) {
-                log.debug("Найдена существующая запись о сходстве событий {} и {}", eventA, eventB);
+                log.info("Найдена существующая запись о сходстве событий {} и {}", eventA, eventB);
                 EventSimilarity existingEventSimilarity = eventSimilarityOpt.get();
 
                 // Сохраняем предыдущее значение для логирования
@@ -116,9 +116,9 @@ public class AnalyzerServiceImpl implements AnalyzerService {
                 EventSimilarity updatedEventSimilarity = eventSimilarityRepository.save(existingEventSimilarity);
                 log.info("Обновлено сходство событий: eventA={}, eventB={}, score изменен с {} на {}",
                         eventA, eventB, oldScore, updatedEventSimilarity.getScore());
-                log.debug("Полные данные обновленного сходства: {}", updatedEventSimilarity);
+                log.info("Полные данные обновленного сходства: {}", updatedEventSimilarity);
             } else {
-                log.debug("Создание новой записи о сходстве событий {} и {}", eventA, eventB);
+                log.info("Создание новой записи о сходстве событий {} и {}", eventA, eventB);
                 EventSimilarity newEventSimilarity = eventSimilarityMapper.toEntity(eventSimilarityAvro);
 
                 if (newEventSimilarity == null) {
@@ -129,7 +129,7 @@ public class AnalyzerServiceImpl implements AnalyzerService {
                 EventSimilarity savedEventSimilarity = eventSimilarityRepository.save(newEventSimilarity);
                 log.info("Создано новое сходство событий: eventA={}, eventB={}, score={}",
                         eventA, eventB, savedEventSimilarity.getScore());
-                log.debug("Полные данные нового сходства: {}", savedEventSimilarity);
+                log.info("Полные данные нового сходства: {}", savedEventSimilarity);
             }
         } catch (Exception e) {
             log.error("Ошибка при сохранении сходства событий: {}", eventSimilarityAvro, e);

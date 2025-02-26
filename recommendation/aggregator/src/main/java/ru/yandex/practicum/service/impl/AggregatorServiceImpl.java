@@ -62,7 +62,7 @@ public class AggregatorServiceImpl implements AggregatorService {
             return;
         }
 
-        log.debug("Начинаем пересчет сходства для {} пар событий", pairsCount);
+        log.info("Начинаем пересчет сходства для {} пар событий", pairsCount);
 
         for (EventPair pair : eventPairsToUpdate) {
             try {
@@ -74,7 +74,7 @@ public class AggregatorServiceImpl implements AggregatorService {
         }
 
         eventPairsToUpdate.clear();
-        log.debug("Пересчет сходства завершен");
+        log.info("Пересчет сходства завершен");
     }
 
     @Override

@@ -2,6 +2,7 @@ package ru.yandex.practicum.service.recommendation.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.grpc.recommendation.InteractionsCountRequestProto;
@@ -14,9 +15,7 @@ import ru.yandex.practicum.repository.EventSimilarityRepository;
 import ru.yandex.practicum.repository.UserActionRepository;
 import ru.yandex.practicum.service.recommendation.RecommendationService;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -51,41 +50,26 @@ public class RecommendationServiceImpl implements RecommendationService {
     public List<RecommendedEventProto> getRecommendationsForUser(UserPredictionsRequestProto request) {
         int userId = request.getUserId();
         int maxResults = request.getMaxResults();
+        int recentLimit = 20; // Количество недавних событий пользователя для анализа, можно настроить параметром
 
-        log.debug("Получение рекомендаций для пользователя userId={}, maxResults={}", userId, maxResults);
+        log.info("Получение рекомендаций для пользователя userId={}, maxResults={}", userId, maxResults);
 
         try {
-            // Получаем недавние события, с которыми взаимодействовал пользователь
-            List<Integer> recentlyInteractedEvents = userActionRepository
-                    .findByUserIdOrderByTimestampDesc(userId)
-                    .stream()
-                    .limit(maxResults)
-                    .map(UserAction::getEventId)
-                    .toList();
+            // Используем новый оптимизированный метод, который выполняет всю логику в одном SQL запросе
+            List<EventSimilarity> recommendedEvents = eventSimilarityRepository
+                    .findRecommendationsForUser(userId, recentLimit, maxResults);
 
-            log.debug("Найдено {} событий, с которыми недавно взаимодействовал пользователь userId={}",
-                    recentlyInteractedEvents.size(), userId);
+            log.info("Найдено {} рекомендуемых событий для пользователя userId={}",
+                    recommendedEvents.size(), userId);
 
-            if (recentlyInteractedEvents.isEmpty()) {
-                log.info("Не найдены взаимодействия пользователя userId={}, возвращаем пустой список рекомендаций", userId);
+            // Если рекомендации не найдены, возвращаем пустой список
+            if (recommendedEvents.isEmpty()) {
+                log.info("Не найдены рекомендации для пользователя userId={}, возвращаем пустой список", userId);
                 return Collections.emptyList();
             }
 
-            // Находим похожие события, с которыми пользователь еще не взаимодействовал
-            List<RecommendedEventProto> recommendations = recentlyInteractedEvents
-                    .stream()
-                    .flatMap(eventId -> {
-                        List<EventSimilarity> similarEvents = eventSimilarityRepository.findRawSimilarEvents(eventId);
-                        log.debug("Найдено {} похожих событий для eventId={}", similarEvents.size(), eventId);
-                        return similarEvents.stream();
-                    })
-                    .filter(event -> {
-                        boolean userHasNotInteracted = !userActionRepository
-                                .existsByUserIdAndEventId(userId, event.getEventA());
-                        return userHasNotInteracted;
-                    })
-                    .sorted(Comparator.comparingDouble(EventSimilarity::getScore).reversed())
-                    .limit(maxResults)
+            // Преобразуем результат в формат ответа
+            List<RecommendedEventProto> recommendations = recommendedEvents.stream()
                     .map(eventSimilarity -> RecommendedEventProto.newBuilder()
                             .setEventId(eventSimilarity.getEventA())
                             .setScore(eventSimilarity.getScore())
@@ -115,37 +99,26 @@ public class RecommendationServiceImpl implements RecommendationService {
         int userId = request.getUserId();
         int maxResults = request.getMaxResults();
 
-        log.debug("Получение похожих событий для eventId={}, userId={}, maxResults={}",
+        log.info("Получение похожих событий для eventId={}, userId={}, maxResults={}",
                 eventId, userId, maxResults);
 
         try {
-            // Получаем все похожие события для заданного идентификатора события
-            List<EventSimilarity> similarEventsData = eventSimilarityRepository.findRawSimilarEvents(eventId);
-            log.debug("Найдено {} похожих событий для eventId={}", similarEventsData.size(), eventId);
+            // Используем новый оптимизированный метод, выполняющий всю логику в одном SQL запросе
+            List<EventSimilarity> similarEvents = eventSimilarityRepository
+                    .findSimilarEventsNotInteractedByUserWithLimit(eventId, userId, maxResults);
 
-            List<RecommendedEventProto> similarEvents = similarEventsData
-                    .stream()
+            log.info("Найдено {} похожих событий для eventId={}, с которыми пользователь userId={} не взаимодействовал",
+                    similarEvents.size(), eventId, userId);
+
+            // Преобразуем результат в формат ответа
+            List<RecommendedEventProto> result = similarEvents.stream()
                     .map(eventSimilarity -> RecommendedEventProto.newBuilder()
                             .setEventId(eventSimilarity.getEventA())
                             .setScore(eventSimilarity.getScore())
                             .build())
                     .toList();
 
-            // Исключаем события, с которыми пользователь уже взаимодействовал
-            List<Integer> userInteractions = userActionRepository.findInteractedEventsByUser(userId);
-            log.debug("Пользователь userId={} взаимодействовал с {} событиями", userId, userInteractions.size());
-
-            List<RecommendedEventProto> filteredEvents = similarEvents
-                    .stream()
-                    .filter(event -> !userInteractions.contains(event.getEventId()))
-                    .sorted(Comparator.comparingDouble(RecommendedEventProto::getScore).reversed())
-                    .limit(maxResults)
-                    .toList();
-
-            log.info("Найдено {} похожих событий для eventId={} для пользователя userId={} после фильтрации",
-                    filteredEvents.size(), eventId, userId);
-
-            return filteredEvents;
+            return result;
         } catch (Exception e) {
             log.error("Ошибка при получении похожих событий для eventId={}, userId={}", eventId, userId, e);
             throw e;
@@ -162,21 +135,31 @@ public class RecommendationServiceImpl implements RecommendationService {
     public List<RecommendedEventProto> getInteractionsCount(InteractionsCountRequestProto request) {
         List<Integer> eventIds = request.getEventIdsList();
 
-        log.debug("Получение количества взаимодействий для {} событий", eventIds.size());
+        log.info("Получение количества взаимодействий для {} событий", eventIds.size());
 
         try {
-            // Получаем количество взаимодействий для каждого события
-            List<RecommendedEventProto> result = eventIds
-                    .stream()
-                    .map(eventId -> {
-                        int interactionCount = userActionRepository.countByEventId(eventId);
-                        log.debug("Для события eventId={} найдено {} взаимодействий", eventId, interactionCount);
+            // Если список пуст, возвращаем пустой результат
+            if (eventIds.isEmpty()) {
+                return Collections.emptyList();
+            }
 
-                        return RecommendedEventProto.newBuilder()
-                                .setEventId(eventId)
-                                .setScore(interactionCount)
-                                .build();
-                    })
+            // Получаем количество взаимодействий за один запрос
+            List<Object[]> countsData = userActionRepository.countByEventIdIn(eventIds);
+
+            // Создаем мапу eventId -> count для быстрого доступа
+            Map<Integer, Long> countMap = new HashMap<>();
+            for (Object[] row : countsData) {
+                int eventId = ((Number) row[0]).intValue();
+                long count = ((Number) row[1]).longValue();
+                countMap.put(eventId, count);
+            }
+
+            // Формируем результат, включая события с нулевым количеством взаимодействий
+            List<RecommendedEventProto> result = eventIds.stream()
+                    .map(eventId -> RecommendedEventProto.newBuilder()
+                            .setEventId(eventId)
+                            .setScore(countMap.getOrDefault(eventId, 0L).intValue())
+                            .build())
                     .toList();
 
             log.info("Успешно получено количество взаимодействий для {} событий", eventIds.size());

@@ -1,15 +1,24 @@
 package ru.yandex.practicum.repository;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ru.yandex.practicum.model.UserAction;
 
+
 import java.util.List;
 
 public interface UserActionRepository extends JpaRepository<UserAction, Long> {
 
-    List<UserAction> findByUserIdOrderByTimestampDesc(@Param("userId") int userId);
+    /**
+     * Находит ограниченное количество действий пользователя, отсортированных по времени в убывающем порядке.
+     *
+     * @param userId идентификатор пользователя
+     * @param pageable объект для пагинации и ограничения количества результатов
+     * @return ограниченный список действий пользователя, отсортированных по времени (сначала новые)
+     */
+    List<UserAction> findByUserIdOrderByTimestampDesc(@Param("userId") int userId, Pageable pageable);
 
     /**
      * Проверяет, взаимодействовал ли пользователь с определенным событием
@@ -36,4 +45,17 @@ public interface UserActionRepository extends JpaRepository<UserAction, Long> {
      * @return Количество взаимодействий
      */
     int countByEventId(int eventId);
+
+    /**
+     * Подсчитывает количество взаимодействий для списка событий за один запрос
+     *
+     * @param eventIds список идентификаторов событий
+     * @return список пар [eventId, count]
+     */
+    @Query(value = "SELECT event_id, COUNT(*) as count " +
+            "FROM user_actions " +
+            "WHERE event_id IN :eventIds " +
+            "GROUP BY event_id",
+            nativeQuery = true)
+    List<Object[]> countByEventIdIn(@Param("eventIds") List<Integer> eventIds);
 }
