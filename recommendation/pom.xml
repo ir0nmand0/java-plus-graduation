@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ru.yandex.practicum</groupId>
+        <artifactId>java-plus-graduation</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>recommendation</artifactId>
+    <packaging>pom</packaging>
+
+    <!-- Список модулей проекта -->
+    <modules>
+        <module>aggregator-avro-model</module>
+        <module>collector-avro-model</module>
+        <module>collector-grpc-api</module>
+        <module>recommendation-grpc-api</module>
+        <module>aggregator</module>
+        <module>analyzer</module>
+        <module>collector</module>
+    </modules>
+
+    <!-- Репозитории для загрузки зависимостей -->
+    <repositories>
+        <repository>
+            <id>confluent</id>
+            <url>https://packages.confluent.io/maven/</url>
+        </repository>
+    </repositories>
+
+    <!-- Глобальные свойства проекта для управления версиями -->
+    <properties>
+        <!-- Версии для gRPC -->
+        <grpc.version>1.63.0</grpc.version>
+        <grpc.server.version>3.1.0.RELEASE</grpc.server.version>
+        <protoc.version>3.23.4</protoc.version>
+        <jakarta.annotation.version>3.0.0</jakarta.annotation.version>
+
+        <!-- Версии для Avro -->
+        <avro.version>1.11.3</avro.version>
+        <confluent.version>7.8.0</confluent.version>
+
+        <!-- Версии плагинов -->
+        <build-helper-maven-plugin.version>3.5.0</build-helper-maven-plugin.version>
+        <avro-maven-plugin.version>1.11.3</avro-maven-plugin.version>
+        <protobuf-maven-plugin.version>2.7.1</protobuf-maven-plugin.version>
+    </properties>
+
+    <!-- Управление зависимостями для всех дочерних модулей -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- Kafka и Avro зависимости -->
+            <dependency>
+                <groupId>io.confluent</groupId>
+                <artifactId>kafka-avro-serializer</artifactId>
+                <version>${confluent.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.avro</groupId>
+                <artifactId>avro</artifactId>
+                <version>${avro.version}</version>
+            </dependency>
+
+            <!-- gRPC зависимости -->
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-stub</artifactId>
+                <version>${grpc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-protobuf</artifactId>
+                <version>${grpc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.devh</groupId>
+                <artifactId>grpc-server-spring-boot-starter</artifactId>
+                <version>${grpc.server.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>jakarta.annotation</groupId>
+                <artifactId>jakarta.annotation-api</artifactId>
+                <version>${jakarta.annotation.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- Управление плагинами для всех дочерних модулей -->
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- Плагин для сборки Avro схем -->
+                <plugin>
+                    <groupId>org.apache.avro</groupId>
+                    <artifactId>avro-maven-plugin</artifactId>
+                    <version>${avro-maven-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <phase>generate-sources</phase>
+                            <goals>
+                                <goal>schema</goal>
+                                <goal>idl-protocol</goal>
+                            </goals>
+                            <configuration>
+                                <sourceDirectory>${project.basedir}/src/main/avro/</sourceDirectory>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!-- Плагин для gRPC -->
+                <plugin>
+                    <groupId>io.github.ascopes</groupId>
+                    <artifactId>protobuf-maven-plugin</artifactId>
+                    <version>${protobuf-maven-plugin.version}</version>
+                    <configuration>
+                        <protocVersion>${protoc.version}</protocVersion>
+                        <binaryMavenPlugins>
+                            <binaryMavenPlugin>
+                                <groupId>io.grpc</groupId>
+                                <artifactId>protoc-gen-grpc-java</artifactId>
+                                <version>${grpc.version}</version>
+                            </binaryMavenPlugin>
+                        </binaryMavenPlugins>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>generate</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!-- Плагин для добавления сгенерированных исходников -->
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${build-helper-maven-plugin.version}</version>
+                    <executions>
+                        <!-- Исполнение для gRPC исходников -->
+                        <execution>
+                            <id>add-protobuf-source</id>
+                            <phase>generate-sources</phase>
+                            <goals>
+                                <goal>add-source</goal>
+                            </goals>
+                            <configuration>
+                                <sources>
+                                    <source>${project.build.directory}/generated-sources/protobuf</source>
+                                </sources>
+                            </configuration>
+                        </execution>
+                        <!-- Исполнение для Avro исходников -->
+                        <execution>
+                            <id>add-avro-source</id>
+                            <phase>generate-sources</phase>
+                            <goals>
+                                <goal>add-source</goal>
+                            </goals>
+                            <configuration>
+                                <sources>
+                                    <source>${project.build.directory}/generated-sources/avro</source>
+                                </sources>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+</project>

@@ -1,0 +1,76 @@
+spring:
+  application:
+    name: aggregator
+  kafka:
+    consumer:
+      bootstrap-servers: kafka:29092
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      properties:
+        schema.registry.url: http://schema-registry:9102
+        specific.avro.reader: true
+        auto.offset.reset: earliest
+        max.poll.records: 500
+        fetch.min.bytes: 1024            # минимальный размер данных для получения
+        fetch.max.wait.ms: 500           # максимальное время ожидания для fetch.min.bytes
+      group-id: ${spring.application.name}
+    producer:
+      bootstrap-servers: kafka:29092
+      properties:
+        schema.registry.url: http://schema-registry:9102
+        acks: all                        # гарантия доставки сообщений
+        retries: 3                       # количество повторных попыток
+        batch.size: 16384                # размер пакета для отправки
+        linger.ms: 5                     # задержка отправки пакета для накопления сообщений
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+
+  cloud:
+    loadbalancer:
+      retry:
+        enabled: true
+        retry-on-all-operations: true
+      service-discovery:
+        timeout: 1s
+
+server:
+  port: 0                               # динамический порт
+  tomcat:                               # оптимизация Tomcat
+    max-threads: 200
+    min-spare-threads: 20
+    connection-timeout: 5000
+
+stats:
+  events-similarity:
+    v1: stats.events-similarity.v1
+
+resilience4j.circuitbreaker:
+  instances:
+    myService:
+      slidingWindowSize: 10
+      failureRateThreshold: 50
+      waitDurationInOpenState: 10000
+      permittedNumberOfCallsInHalfOpenState: 3
+      slidingWindowType: COUNT_BASED
+      minimumNumberOfCalls: 5
+      automaticTransitionFromOpenToHalfOpenEnabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  health:
+    circuitbreakers:
+      enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.netflix.discovery: WARN
+    org.springframework.cloud: INFO
+    org.apache.kafka: WARN

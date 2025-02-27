@@ -1,0 +1,41 @@
+// Определяет версию протокола буфера, которая используется в этом файле
+syntax = "proto3";
+
+// Импортирует стандартный тип данных timestamp из библиотеки Google Protocol Buffers
+import "google/protobuf/timestamp.proto";
+
+// Указывает компилятору protoc генерировать отдельный .java файл для каждого сообщения
+option java_multiple_files = true;
+// Определяет Java пакет, в котором будут размещены сгенерированные классы
+option java_package = "ru.yandex.practicum.grpc.collector.user";
+
+// Определяет пространство имен для всех типов данных в этом файле
+package collector;
+
+// Описывает структуру сообщения, которое представляет действие пользователя
+message UserActionProto {
+  // Идентификатор пользователя, который совершил действие
+  int64 user_id = 1;
+
+  // Идентификатор события, связанного с действием пользователя
+  int64 event_id = 2;
+
+  // Тип действия, выбранный из перечисления ActionTypeProto
+  ActionTypeProto action_type = 3;
+
+  // Временная метка, когда действие было совершено
+  // Использует стандартный тип timestamp из библиотеки Google Protocol Buffers
+  google.protobuf.Timestamp timestamp = 4;
+}
+
+// Перечисление возможных типов действий пользователя
+enum ActionTypeProto {
+  // Действие просмотра (значение по умолчанию = 0)
+  ACTION_VIEW = 0;
+
+  // Действие регистрации
+  ACTION_REGISTER = 1;
+
+  // Действие постановки лайка
+  ACTION_LIKE = 2;
+}

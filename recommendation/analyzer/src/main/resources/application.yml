@@ -1,0 +1,148 @@
+spring:
+  application:
+    name: analyzer
+  config:
+    import: "configserver:"
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        service-id: config-server
+      fail-fast: true
+      retry:
+        max-attempts: 5             # добавлено количество попыток
+        initial-interval: 2000      # начальный интервал в мс
+        max-interval: 6000
+        multiplier: 1.5             # множитель для экспоненциального отступа
+    loadbalancer:
+      cache:
+        enabled: true               # кеширование для улучшения производительности
+        ttl: 5s                     # время жизни кеша в секундах
+      retry:
+        enabled: true
+        retry-on-all-operations: true
+        max-retries-on-same-service-instance: 2
+        max-retries-on-next-service-instance: 3
+  # Настройки для HTTP клиентов
+  webflux:
+    client:
+      max-connections: 2000         # максимальное количество соединений для WebClient
+      max-idle-time: 30s            # время простоя соединений
+  feign:
+    client:
+      config:
+        default:
+          connectTimeout: 5000
+          readTimeout: 5000
+          loggerLevel: basic
+    circuitbreaker:
+      enabled: true
+    compression:
+      request:
+        enabled: true
+        mime-types: text/xml,application/xml,application/json
+        min-request-size: 2048
+      response:
+        enabled: true
+
+# Настройки для Eureka
+eureka:
+  client:
+    fetch-registry: true
+    registry-fetch-interval-seconds: 2    # как часто обновлять регистр
+    initial-instance-info-replication-interval-seconds: 2
+    service-url:
+      defaultZone: http://${eureka.instance.hostname:discovery-server}:${eureka.instance.port:8761}/eureka/
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${random.uuid}
+    lease-renewal-interval-in-seconds: 5    # интервал обновления
+    lease-expiration-duration-in-seconds: 20 # время истечения аренды
+    metadata-map:
+      zone: ${ZONE:default}                 # метаданные для зонирования
+      version: ${VERSION:1.0.0}             # версия для канареечного деплоя
+
+# Настройки для устойчивости клиента
+resilience4j:
+  circuitbreaker:
+    instances:
+      default:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowType: COUNT_BASED
+        minimumNumberOfCalls: 5
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        record-exceptions:
+          - java.io.IOException
+          - java.net.ConnectException
+          - org.springframework.web.client.ResourceAccessException
+  retry:
+    instances:
+      default:
+        maxAttempts: 3
+        waitDuration: 1s
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+        retryExceptions:
+          - java.io.IOException
+          - java.net.ConnectException
+          - org.springframework.web.client.ResourceAccessException
+  bulkhead:
+    instances:
+      default:
+        maxConcurrentCalls: 20
+  timelimiter:
+    instances:
+      default:
+        timeoutDuration: 5s
+        cancelRunningFuture: true
+  ratelimiter:
+    instances:
+      default:
+        limitForPeriod: 100
+        limitRefreshPeriod: 1s
+        timeoutDuration: 500ms
+
+# HTTP клиент и соединения
+httpclient:
+  max-total-connections: 500
+  default-max-per-route: 100
+  connection-request-timeout: 5000
+  connection-timeout: 5000
+  socket-timeout: 5000
+  time-to-live: 900
+  idle-connection-wait: 30000
+
+# Настройки для клиентского мониторинга
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.client.requests: true
+      percentiles:
+        http.client.requests: 0.5, 0.95, 0.99
+  health:
+    circuitbreakers:
+      enabled: true
+    diskspace:
+      enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+# Логирование для клиента
+logging:
+  level:
+    root: INFO
+    com.netflix.discovery: WARN
+    org.springframework.cloud: INFO
+    org.springframework.web.client: INFO
+    feign: INFO
+    org.apache.http: WARN
